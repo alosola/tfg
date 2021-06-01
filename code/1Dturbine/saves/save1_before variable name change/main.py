@@ -10,11 +10,22 @@ File: main.py
 
 """
 
+## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
 import matplotlib.pyplot as plt      # library for plots
 import pandas as pd                  # library for tables and data visualisation
 
-from aux_functions import rho1_converge, blade_geometry, turbine
+## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
+from aux_functions import rhox_converge, blade_geometry
+from definitions import stage, geometry
+
+
+
+
+
+
+
+
 
 ###################### GIVEN PARAMETERS AND ASSUMTIOSN ########################
 
@@ -186,6 +197,11 @@ T03 = T3*(1+(gamma-1)/2*Mach3**2)
 P03 = P3*(1+(gamma-1)/2*Mach3**2)**(gamma/(gamma-1))
 DeltaH_T2 = cp*(T01-T03)
 
+
+
+
+
+
 # blade geometry at 2
 R2tip, R2hub, h2, R2mean, D2mean, A2 = blade_geometry(mdot, rho2, V2x, RHT)
 
@@ -195,7 +211,7 @@ RPM = 60*Omega2/2/np.pi
 
 # massflow and characteristics at inlet
 rho01 = P01/T01/R
-rho1 = rho1_converge(0.9999*rho01, rho01, T01, mdot, A2, gamma, cp) # iteraciones hasta converger
+rho1 = rhox_converge(0.9999*rho01, rho01, T01, mdot, A2, gamma, cp) # iteraciones hasta converger
 V1 = np.sqrt(2*cp*T01*(1-(rho1/rho01)**(gamma-1)))
 T1 = T01 - V1**2/2/cp
 P1 = P01*(T1/T01)**(gamma/(gamma-1)) # isentropic
@@ -206,7 +222,6 @@ A1 = mdot/rho1/V1
 # blade geometry at 1
 R1tip, R1hub, h1, R1mean, D1mean, A1 = blade_geometry(mdot, rho1, V1, RHT)
 
-
 # blade geometry at 3
 ########## NO ENTIENDO NADAAAAA
 A3 = mdot/V3x/rho3
@@ -215,12 +230,12 @@ R3tip = R2mean+h3/2
 D3mean = R3tip*2 - h3
 R3mean = D3mean/2
 
-
 Omega3 = U3/R3mean
 
-
-
-
+GR_enthalpy = (T2 - T3)/(T02 - T03) # Assume v1 = v3, not right
+Deltabeta = abs(beta2 - beta3) # por qué no negativo?
+DeltaW = W3 - W2
+heightratio = h3/h2
 
 
 
@@ -245,17 +260,8 @@ data3 = {'Variable': ['M3 impose','P3 impose','T03','P03','V3','T3','P3','rho3',
 df3 = pd.DataFrame (data3, columns = ['Variable','Value'])
 print (df3)
 
-turb = turbine()
-turb.P.Rtip = 20
-turb.rho1_init = 1.1
-turb.rho01 = 1.2
-turb.T01 = 1000
-turb.mdot = 7
-turb.A2 = 0.05
-turb.gamma = 1.4
-turb.cp = 1000
 
-print(turb.P.Rtip)
+
 
 # plt.plot([1, 2, 3], [P01, P02, P3], 'k--')
 # plt.title("P0")
