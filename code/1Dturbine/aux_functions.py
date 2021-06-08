@@ -99,8 +99,14 @@ def RPM(Omega):
     return RPM
 
 
+def total_conditions(T3, V3, P3, cp, gamma):
+    T03 = T3 + V3**2/2/cp
+    P03 = P3*(T03/T3)**(gamma/(gamma-1))
+    return T03, P03
 
-
+def efficiency(I, F, Fs):
+    eta = (I - F)/(I - Fs)
+    return eta
 
 
 # def isen_evolution(x, M, gamma):

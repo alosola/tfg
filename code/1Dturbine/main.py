@@ -58,6 +58,7 @@ eta_stator = 0.888          # stator efficiency [-]
 eta_rotor = 0.808           # rotor efficiency [-]
 alpha2  = np.radians(75.3)  # stator angle [deg->rad]
 beta3 = np.radians(-65)     # rotor angle [deg->rad]
+
 RHT = 0.9                   # ratio hub/tip radius
 mdot = 0.777482308          # total mass flow [kg/s]
 rho1 = 0.98317              # inlet density [kg/m^3]
@@ -172,9 +173,12 @@ Mach3c = V3/a3
 DeltaH_T1 = U3*(V2u-V3u)    # euler formulation
 
 # compute total condtions
-T03, P03 = f.relative_temperature_pressure(T3, P3, Mach3, gamma)
+# T03, P03 = f.relative_temperature_pressure(T3, P3, Mach3, gamma)
 # T03 = T3*(1+(gamma-1)/2*Mach3**2)
 # P03 = P3*(1+(gamma-1)/2*Mach3**2)**(gamma/(gamma-1))
+
+T03, P03 = f.total_conditions(T3, V3, P3, cp, gamma)
+
 DeltaH_T2 = cp*(T01-T03)
 
 
@@ -212,36 +216,70 @@ R3mean = D3mean/2
 Omega3 = U3/R3mean
 
 GR_enthalpy = (T2 - T3)/(T02 - T03) # Assume v1 = v3, not right
-Deltabeta = abs(beta2 - beta3) # por qué no negativo?
+Deltabeta = beta2 - beta3 # por qué no negativo?
+Deltaalpha = alpha2 - alpha3
+GR_final = (T2 - T3)/(T1 - T3)
 DeltaW = W3 - W2
-heightratio = h3/h2
+h3h2 = h3/h2
+
+
+# SOODERBERG CORRELATION LOSSES
+# rotor
+H3 = T3*cp
+H3s = T3s*cp
+epsr = 2*(H3 - H3s)/W3**2
+#stator
+H2 = T2*cp
+H2s = T2s*cp
+epse = 2*(H2 - H2s)/V2**2
+
+# efficiencies
+H01 = cp*T01
+H03 = cp*T03
+T3s = T01*(P3/P01)**((gamma-1)/gamma)
+H3s = cp*T3s
+etaTT = (H01 - H03)/(H01 - (H3s+V3**2/2))
+etaTS = (H01 - H03)/(H01 - H3s)
+
+epsp = (V2s**2 - V2**2)/V2**2
+epspp = (W3s**2 - W3**2)/W3**2
+
+knls_stator = epsp*(1+gamma*Mach2**2/2)
+knls_rotor = epspp*(1+gamma*Mach3r**2/2)
+
+
+
+stg = np.radians(60)
+opt_pitch_chord = 0.6*np.cos(stg)/2/np.cos(alpha2)**2/(V1/V2x*np.tan(alpha1) + np.tan(alpha2))*(h1/h2)*P01/P02
 
 
 
 
-## print data to tables
-data1 = {'Variable':  ['T01', 'P01', 'V1', 'T1', 'P1', 'rho1', 'A1', 'Mach1', 'alpha1', 'mdot', 'R1tip', 'R1hub', 'h1', 'mdot'],
-        'Value':     [T01, P01, V1, T1, P1, rho1, A1, Mach1, np.degrees(alpha1), mdot, R1tip, R1hub, h1, mdot],
-        'Unit':      ['K', 'Pa', 'm/s', 'K', 'Pa', 'kg/m^3', 'm^2', '-', 'deg', 'kg/s', 'm', 'm', 'm', 'kg/s']}
-df1 = pd.DataFrame (data1, columns = ['Variable','Value','Unit'])
-print (df1)
+# ## print data to tables
+# data1 = {'Variable':  ['T01', 'P01', 'V1', 'T1', 'P1', 'rho1', 'A1', 'Mach1', 'alpha1', 'mdot', 'R1tip', 'R1hub', 'h1', 'mdot'],
+#         'Value':     [T01, P01, V1, T1, P1, rho1, A1, Mach1, np.degrees(alpha1), mdot, R1tip, R1hub, h1, mdot],
+#         'Unit':      ['K', 'Pa', 'm/s', 'K', 'Pa', 'kg/m^3', 'm^2', '-', 'deg', 'kg/s', 'm', 'm', 'm', 'kg/s']}
+# df1 = pd.DataFrame (data1, columns = ['Variable','Value','Unit'])
+# print (df1)
 
-data2 = {'Variable': ['T02', 'P02', 'V2', 'T2','P2','rho2','T2is','M2','Alpha2','V2x','V2u','W2','T02r','P02r','Beta2','W2x','W2u','Mw2','v2is','U2','Total pressure loss (stator)','A2','rh2','rt2','rm2','h2','omega'],
-          'Value':    [T02, P02, V2, T2, P2,rho2,T2s,Mach2,np.degrees(alpha2),V2x,V2u,W2,T02r,P02r,np.degrees(beta2),W2x,W2u,Mach2r,V2s,U2,tpl_stator,A2,R2hub,R2tip,R2mean,h2,Omega2]}
-# data2 = {'Variable': ['T02', 'P02', 'V2', 'T2','P2','rho2','T2is','M2','Alpha2','V2x','V2u','W2','T02r','P02r','Beta2','W2x','W2u','Mw2','v2is','U2','Total pressure loss (rotor?)','A2','rh2','rt2','rm2','h2','omega','H01','epsp','kinetic loss stator','optimim pitch/chord sorderberg','chord','h/c','Re dh','dh','Re c','nblades'
-# ],
-#          'Value':    [T02, P02, V2, T2, P2,rho2,T2s,Mach2,np.degrees(alpha2),V2x,V2u,W2,T02r,P02r,np.degrees(beta2),W2x,W2u,Mach2r,V2s,U2,tpl_rotor,A2,R2hub,R2tip,R2mean,h2,Omega2,'--','---',kinetic loss stator,optimim pitch/chord sorderberg,chord,h/c,Re dh,dh,Re c,nblades]}
-df2 = pd.DataFrame (data2, columns = ['Variable','Value'])
-print (df2)
+# data2 = {'Variable': ['T02', 'P02', 'V2', 'T2','P2','rho2','T2is','M2','Alpha2','V2x','V2u','W2','T02r','P02r','Beta2','W2x','W2u','Mw2','v2is','U2','Total pressure loss (stator)','A2','rh2','rt2','rm2','h2','omega'],
+#           'Value':    [T02, P02, V2, T2, P2,rho2,T2s,Mach2,np.degrees(alpha2),V2x,V2u,W2,T02r,P02r,np.degrees(beta2),W2x,W2u,Mach2r,V2s,U2,tpl_stator,A2,R2hub,R2tip,R2mean,h2,Omega2]}
+# # data2 = {'Variable': ['T02', 'P02', 'V2', 'T2','P2','rho2','T2is','M2','Alpha2','V2x','V2u','W2','T02r','P02r','Beta2','W2x','W2u','Mw2','v2is','U2','Total pressure loss (rotor?)','A2','rh2','rt2','rm2','h2','omega','H01','epsp','kinetic loss stator','optimim pitch/chord sorderberg','chord','h/c','Re dh','dh','Re c','nblades'
+# # ],
+# #          'Value':    [T02, P02, V2, T2, P2,rho2,T2s,Mach2,np.degrees(alpha2),V2x,V2u,W2,T02r,P02r,np.degrees(beta2),W2x,W2u,Mach2r,V2s,U2,tpl_rotor,A2,R2hub,R2tip,R2mean,h2,Omega2,'--','---',kinetic loss stator,optimim pitch/chord sorderberg,chord,h/c,Re dh,dh,Re c,nblades]}
+# df2 = pd.DataFrame (data2, columns = ['Variable','Value'])
+# print (df2)
 
-data3 = {'Variable': ['M3 impose','P3 impose','T03','P03','V3','T3','P3','rho3','T3is','T3iss','M3 achieve','P3 achieve','Alpha3','V3x','V3u','W3','T03r','P03r','Beta3','W3x','W3u','Mw3','U3','Total pressure loss (rotor)','A3','rh3','rt3','rm3'],
-          'Value':     [Mach3,P3,T03,P03,V3,T3,P3,rho3,T3s,'---',Mach3c,'---',np.degrees(alpha3),V3x,V3u,W3,T03r,P03r,np.degrees(beta3),W3x,W3u,Mach3r,U3,tpl_rotor,A3,R2hub,R3tip,R3mean]}
-df3 = pd.DataFrame (data3, columns = ['Variable','Value'])
-print (df3)
+# data3 = {'Variable': ['M3 impose','P3 impose','T03','P03','V3','T3','P3','rho3','T3is','T3iss','M3 achieve','P3 achieve','Alpha3','V3x','V3u','W3','T03r','P03r','Beta3','W3x','W3u','Mw3','U3','Total pressure loss (rotor)','A3','rh3','rt3','rm3'],
+#           'Value':     [Mach3,P3,T03,P03,V3,T3,P3,rho3,T3s,'---',Mach3c,'---',np.degrees(alpha3),V3x,V3u,W3,T03r,P03r,np.degrees(beta3),W3x,W3u,Mach3r,U3,tpl_rotor,A3,R2hub,R3tip,R3mean]}
+# df3 = pd.DataFrame (data3, columns = ['Variable','Value'])
+# print (df3)
 
 
 graphs.velocity_triangle(V2u, V2x, V3u, V3x, W2u, W2x, W3u, W3x)
 
+# ORIGINAL GRAPH FROM JS STUDY
+# graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89, 254.09)
 
 # plt.plot([1, 2, 3], [P01, P02, P3], 'k--')
 # plt.title("P0")
