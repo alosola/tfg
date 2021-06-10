@@ -13,7 +13,24 @@ Description: contains definitions of thermodynamic functions used in the
 """
 
 import numpy as np                   # library for math and calculation functions
+from scipy.optimize import newton, fsolve
 
+
+def rhox_converge(rhox_init, rho0x, T0x, mdot, Ay, gamma, cp):
+    """
+    Function to find the density rho for a certain point x, from the
+    temperature, mass flux, and area data.
+    Using an initial guess rhox_init, which is always less than rho0x
+    """
+
+    def f(rhox, rho0x, T0x, mdot, Ay, gamma, cp):
+        Vx = np.sqrt(2*cp*T0x*(1-(rhox/rho0x)**(gamma-1)))
+        Ax = mdot/rhox/Vx
+        return Ay-Ax
+
+    rhox = fsolve(f,rhox_init,args=(rho0x, T0x, mdot, Ay, gamma, cp))[0]
+
+    return rhox;
 
 
 def blade_geometry(mdot, rho, Vx, RHT):

@@ -11,13 +11,8 @@ Description: containts definitions for additional clases and variable types
 
 """
 
-class thermo():
-    def __init__(self):
-        self.gamma = None
-        self.cp = None
-        self.R = None
 
-class plane():
+class stage():
     def __init__(self):
         self.P = None
         self.P0 = None
@@ -26,11 +21,9 @@ class plane():
         self.T0 = None
         self.T0r = None
         self.Ts = None
-        self.H = None
-        self.H0 = None
-        self.Hs = None
         self.rho = None
         self.rho0 = None
+        self.A = None
         self.geo = geometry()
         self.vel = velocity()
         self.alpha = None
@@ -42,6 +35,8 @@ class component():
         self.xi = None     # kinetic loss coefficient
         self.loss = None   # loss ??
         self.tpl = None    # total pressure loss
+        self.omega = None  # rotational speed
+        self.RPM = None    # revolutions per minute
 
 class geometry():
     def __init__(self):
@@ -69,5 +64,7 @@ class velocity():
         self.Wx = None
         self.Wu = None
         self.Ws = None
-        self.Omega = None
-        self.RPM = None
+
+
+
+

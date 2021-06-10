@@ -12,12 +12,13 @@ File: main.py
 
 ## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
+import matplotlib.pyplot as plt      # library for plots
 import pandas as pd                  # library for tables and data visualisation
 
 ## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
 import aux_functions as f
 import plot_functions as graphs
-from definitions import plane, component
+from definitions import plane, component, geometry, velocity
 from solve_functions import solve_rhox
 from converge_mach3 import converge_mach3
 
@@ -50,7 +51,7 @@ R = 286.1538462          # [J/kg/K]
 
 # ASSUMPTIONS
 # note: 3 is rotor exit, 2 in my report
-Mach3_init = 0.1               # rotor/turbine exit Mach number [-]
+Mach3_init = 0.2               # rotor/turbine exit Mach number [-]
 GR = 0.32                       # reaction degree [-]
 phi = 1.75                      # loading factor [-]
 stator.eta = 0.888              # stator efficiency [-]
@@ -190,12 +191,12 @@ opt_pitch_chord = 0.6*np.cos(stg)/2/np.cos(two.alpha)**2/(one.vel.V/two.vel.Vx*n
 # df3 = pd.DataFrame (datthr.vel.a, columns = ['Variable','Value'])
 # print (df3)
 
-# ORIGINAL GRAPH FROM JS STUDY
-graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89, 254.09)
 
 
 graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel.Wu, two.vel.Wx, thr.vel.Wu, thr.vel.Wx)
 
+# ORIGINAL GRAPH FROM JS STUDY
+graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89, 254.09)
 
 # plt.plot([1, 2, 3], [one.P0, two.P0, thr.P], 'k--')
 # plt.title("P0")
