@@ -47,6 +47,10 @@ psi = 1.75                      # loading factor [-]
 stator.eta = 0.888              # stator efficiency [-]
 rotor.eta = 0.808               # rotor efficiency [-]
 
+# upper and lower bounds for alpha2 and beta3
+# in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
+bounds_angles = ([np.radians(70),np.radians(-65)], [np.radians(75), np.radians(-60)])
+
 
 # FLUID PROPERTIES (TURBINE)
 gamma = 1.3              # [-]
@@ -58,6 +62,7 @@ Mach3_init = 0.5                  # rotor/turbine exit Mach number [-]
 alpha2_init  = np.radians(75)     # stator angle [deg->rad]
 beta3_init = np.radians(-65)      # rotor angle [deg->rad]
 
+
 RHT = 0.9                       # ratio hub/tip radius
 mdot = 0.777482308              # total mass flow [kg/s]
 one.rho = 0.98317               # inlet density [kg/m^3]
@@ -65,7 +70,6 @@ thr.geo.Rh = 0.106              # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 if asusmed axial) [rad]
 
 
-bounds_angles = ([np.radians(70),np.radians(-65)], [np.radians(75), np.radians(-60)])
 
 
 
