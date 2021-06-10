@@ -36,9 +36,9 @@ def solve_rhox(rhox_init, rho0x, T0x, mdot, Ay, gamma, cp):
 
 
 
-def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles):
+def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles):
 
-    def f_angles(angles, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod):
+    def f_angles(angles, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod):
 
         alpha = angles[0]
         beta = angles[1]
@@ -48,7 +48,7 @@ def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, ps
         two.vel.Vx, two.vel.Vu = f.velocity_projections(two.vel.V, alpha)
 
         # assume a loading factor and calculate peripheral speed
-        two.vel.U = np.sqrt(DeltaH_prod/psi)
+        two.vel.U = np.sqrt(DeltaH_prod/phi)
 
         # velocity triangle (pithagoras)
         two.vel.Wu = two.vel.Vu - two.vel.U
@@ -73,6 +73,9 @@ def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, ps
         # velocities
         thr.vel.W = f.isen_velocity(cp, thr.T0r, thr.T)                  # = np.sqrt(2*cp*(thr.T0r - thr.T))
 
+        # speed of sound and relative mach number
+        thr.vel.a, thr.vel.Mr = f.sonic(gamma, R, thr.T, thr.vel.W)                      # = np.sqrt(gamma*R*thr.T)
+
         # velocity projections, axial and tangential
         thr.vel.Wx, thr.vel.Wu = f.velocity_projections(thr.vel.W, beta)
 
@@ -83,6 +86,9 @@ def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, ps
         thr.vel.Vu = thr.vel.Wu + thr.vel.U
         # V3u_euler = -DeltaH_prod/two.vel.U + two.vel.Vu
 
+        # assume axial speed constant
+        thr.vel.Vx = thr.vel.Wx
+        thr.vel.V = f.mag(thr.vel.Vx, thr.vel.Vu)                           # = np.sqrt(thr.vel.Vx**2 + thr.vel.Vu**2)
 
         # find work, check for angle iteration
         DeltaH_calculated = two.vel.U*(two.vel.Vu - thr.vel.Vu)
@@ -92,12 +98,9 @@ def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, ps
 
         return np.array([diff[0], 0])
 
-    # angles  = fsolve(f_angles,angles_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod))
-    results  = least_squares(f_angles,angles_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod),bounds=bounds_angles, method='trf')
+    # angles  = fsolve(f_angles,angles_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod))
+    results  = least_squares(f_angles,angles_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod),bounds=bounds_angles, method='trf')
     # (the least_squares method allows for the inclusion of bounds)
-
-    # if results.success != False:
-    #     print('ERROR: The angle conversion was not successful (function solve_angles in solve_functions.py)')
 
     return results.x
 

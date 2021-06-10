@@ -18,9 +18,9 @@ import aux_functions as f
 from solve_functions import solve_angles
 
 
-def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles):
+def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles):
 
-    def f_mach3(Mach3, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles):
+    def f_mach3(Mach3, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles):
 
         thr.vel.M = Mach3
 
@@ -51,18 +51,15 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
         # get initial guess for angles
         angles_init = np.array([two.alpha, thr.beta])
 
-
-        ## ANGLE CONVERGENCE FOR ALPHA2 AND BETA3
-        angles = solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles)
+        angles = solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles)
 
         two.alpha = angles[0]
-        thr.beta = angles[1]                       # = np.sqrt(thr.vel.Vx**2 + thr.vel.Vu**2)
-
+        thr.beta = angles[1]
 
         two.vel.Vx, two.vel.Vu = f.velocity_projections(two.vel.V, two.alpha)
 
         # assume a loading factor and calculate peripheral speed
-        two.vel.U = np.sqrt(DeltaH_prod/psi)
+        two.vel.U = np.sqrt(DeltaH_prod/phi)
 
         # velocity triangle (pithagoras)
         two.vel.Wu = two.vel.Vu - two.vel.U
@@ -109,11 +106,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
 
         return Mach3_calculated - Mach3
 
-    thr.vel.M  = fsolve(f_mach3,Mach3_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles))[0]
-
-    # speed of sound and relative mach number AT 3
-    thr.vel.a, thr.vel.Mr = f.sonic(gamma, R, thr.T, thr.vel.W)                      # = np.sqrt(gamma*R*thr.T)
-
+    thr.vel.M  = fsolve(f_mach3,Mach3_init,args=(one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles))[0]
 
     # using mach, find static pressure
     thr.P = f.static_pressure(thr.P0, gamma, thr.vel.M)    # = thr.P0/(1+(gamma-1)/2*thr.vel.M**2)**(gamma/(gamma-1))
@@ -144,7 +137,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
     two.vel.Vx, two.vel.Vu = f.velocity_projections(two.vel.V, two.alpha)
 
     # assume a loading factor and calculate peripheral speed
-    two.vel.U = np.sqrt(DeltaH_prod/psi)
+    two.vel.U = np.sqrt(DeltaH_prod/phi)
 
     # velocity triangle (pithagoras)
     two.vel.Wu = two.vel.Vu - two.vel.U
@@ -205,4 +198,4 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
 
 
 
-    return one, two, thr, stator, rotor, DeltaH_calculated
+    return one, two, thr, stator, rotor

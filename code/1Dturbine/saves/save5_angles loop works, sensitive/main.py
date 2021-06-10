@@ -2,7 +2,7 @@
 """
 Created on Fri May 14 11:11:08 2021
 
-@author: alondra sola
+@autwor: alondra sola
 
 Project: turbine design tool (TFG)
 Program: 1D analysis (imitating the "automobile gas generator" design tool)
@@ -12,11 +12,11 @@ File: main.py
 
 ## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
+import pandas as pd                  # library for tables and data visualisation
 
 ## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
 import aux_functions as f
 import plot_functions as graphs
-import tables_results as tab
 from definitions import plane, component
 from solve_functions import solve_rhox
 from converge_mach3 import converge_mach3
@@ -38,14 +38,11 @@ one.T0 = 1400                     # inlet total temperature (exit combustor) = T
 one.P0 = 397194                   # inlet total pressure (exit combustor) [Pa]
 thr.P0 = 101325                   # outlet total pressure [Pa]
 thr.T0 = 1083.529                 # outlet total temperature [K]
-DeltaH_prod = 390000              # enthalpy produced by turbine [J/Kg]
+DeltaH_prod = 392423.1109         # enthalpy produced by turbine [J/Kg]
 
 
 # ASSUMPTIONS
 GR = 0.32                       # reaction degree [-]
-psi = 1.75                      # loading factor [-]
-stator.eta = 0.888              # stator efficiency [-]
-rotor.eta = 0.808               # rotor efficiency [-]
 
 
 # FLUID PROPERTIES (TURBINE)
@@ -53,10 +50,14 @@ gamma = 1.3              # [-]
 cp = 1240                # [J/kg/K]
 R = 286.1538462          # [J/kg/K]
 
-# INITIAL GUESSES
-Mach3_init = 0.5                  # rotor/turbine exit Mach number [-]
-alpha2_init  = np.radians(75)     # stator angle [deg->rad]
-beta3_init = np.radians(-65)      # rotor angle [deg->rad]
+
+# ASSUMPTIONS
+Mach3_init = 0.50               # rotor/turbine exit Mach number [-]
+phi = 1.75                      # loading factor [-]
+stator.eta = 0.888              # stator efficiency [-]
+rotor.eta = 0.808               # rotor efficiency [-]
+two.alpha  = np.radians(75)   # stator angle [deg->rad]
+thr.beta = np.radians(-65)      # rotor angle [deg->rad]
 
 RHT = 0.9                       # ratio hub/tip radius
 mdot = 0.777482308              # total mass flow [kg/s]
@@ -64,15 +65,9 @@ one.rho = 0.98317               # inlet density [kg/m^3]
 thr.geo.Rh = 0.106              # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 if asusmed axial) [rad]
 
-
 bounds_angles = ([np.radians(70),np.radians(-65)], [np.radians(75), np.radians(-60)])
 
-
-
-# use initial values to begin conversion
-two.alpha = alpha2_init
-thr.beta = beta3_init
-one, two, thr, stator, rotor, DeltaH_calculated = converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles)
+one, two, thr, stator, rotor = converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod, bounds_angles)
 
 
 
@@ -174,11 +169,38 @@ stg = np.radians(60)
 opt_pitch_chord = 0.6*np.cos(stg)/2/np.cos(two.alpha)**2/(one.vel.V/two.vel.Vx*np.tan(one.alpha) + np.tan(two.alpha))*(one.geo.h/two.geo.h)*one.P0/two.P0
 
 
-# PLOT TABLE OF RESULTS
-tab.convergence_parameters(one, two, thr, Mach3_init, alpha2_init, beta3_init, DeltaH_prod, DeltaH_calculated)
 
-# ORIGINAL GRAPH FROM JS GAS GENERATOR STUDY
+
+# ## print data to tables
+# datone.vel.a = {'Variable':  ['one.T0', 'one.P0', 'one.vel.V', 'one.T', 'one.P', 'one.rho', 'one.geo.A', 'one.vel.M', 'one.alpha', 'mdot', 'one.geo.Rt', 'one.geo.Rh', 'one.geo.h', 'mdot'],
+#         'Value':     [one.T0, one.P0, one.vel.V, one.T, one.P, one.rho, one.geo.A, one.vel.M, np.degrees(one.alpha), mdot, one.geo.Rt, one.geo.Rh, one.geo.h, mdot],
+#         'Unit':      ['K', 'Pa', 'm/s', 'K', 'Pa', 'kg/m^3', 'm^2', '-', 'deg', 'kg/s', 'm', 'm', 'm', 'kg/s']}
+# df1 = pd.DataFrame (datone.vel.a, columns = ['Variable','Value','Unit'])
+# print (df1)
+
+# dattwo.vel.a = {'Variable': ['two.T0', 'two.P0', 'two.vel.V', 'two.T','two.P','two.rho','two.Tis','M2','two.alpha','two.vel.Vx','two.vel.Vu','two.vel.W','two.T0r','two.P0r','Bettwo.vel.a','two.vel.Wx','two.vel.Wu','Mw2','v2is','two.vel.U','Total pressure loss (stator)','A2','rtwo.geo.h','rt2','rm2','two.geo.h','omega'],
+#           'Value':    [two.T0, two.P0, two.vel.V, two.T, two.P,two.rho,two.Ts,two.vel.M,np.degrees(two.alpha),two.vel.Vx,two.vel.Vu,two.vel.W,two.T0r,two.P0r,np.degrees(two.beta),two.vel.Wx,two.vel.Wu,two.vel.Mr,two.vel.Vs,two.vel.U,tpl_stator,A2,two.geo.Rh,two.geo.Rt,two.geo.Rm,two.geo.h,two.vel.Omega]}
+# # dattwo.vel.a = {'Variable': ['two.T0', 'two.P0', 'two.vel.V', 'two.T','two.P','two.rho','two.Tis','M2','two.alpha','two.vel.Vx','two.vel.Vu','two.vel.W','two.T0r','two.P0r','Bettwo.vel.a','two.vel.Wx','two.vel.Wu','Mw2','v2is','two.vel.U','Total pressure loss (rotor?)','A2','rtwo.geo.h','rt2','rm2','two.geo.h','omega','one.H0','epsp','kinetic loss stator','optimim pitch/chord sorderberg','chord','h/c','Re dh','dh','Re c','nblades'
+# # ],
+# #          'Value':    [two.T0, two.P0, two.vel.V, two.T, two.P,two.rho,two.Ts,two.vel.M,np.degrees(two.alpha),two.vel.Vx,two.vel.Vu,two.vel.W,two.T0r,two.P0r,np.degrees(two.beta),two.vel.Wx,two.vel.Wu,two.vel.Mr,two.vel.Vs,two.vel.U,tpl_rotor,A2,two.geo.Rh,two.geo.Rt,two.geo.Rm,two.geo.h,two.vel.Omega,'--','---',kinetic loss stator,optimim pitch/chord sorderberg,chord,h/c,Re dh,dh,Re c,nblades]}
+# df2 = pd.DataFrame (dattwo.vel.a, columns = ['Variable','Value'])
+# print (df2)
+
+# datthr.vel.a = {'Variable': ['M3 impose','thr.P impose','thr.T0','thr.P0','thr.vel.V','thr.T','thr.P','thr.rho','thr.Tis','thr.Tiss','M3 achieve','thr.P achieve','Alphthr.vel.a','thr.vel.Vx','thr.vel.Vu','thr.vel.W','thr.T0r','thr.P0r','thr.beta','thr.vel.Wx','thr.vel.Wu','Mw3','thr.vel.U','Total pressure loss (rotor)','thr.geo.A','rthr.geo.h','rt3','rm3'],
+#           'Value':     [thr.vel.M,thr.P,thr.T0,thr.P0,thr.vel.V,thr.T,thr.P,thr.rho,thr.Ts,'---',thr.vel.Mc,'---',np.degrees(thr.alpha),thr.vel.Vx,thr.vel.Vu,thr.vel.W,thr.T0r,thr.P0r,np.degrees(thr.beta),thr.vel.Wx,thr.vel.Wu,thr.vel.Mr,thr.vel.U,tpl_rotor,thr.geo.A,two.geo.Rh,thr.geo.Rt,thr.geo.Rm]}
+# df3 = pd.DataFrame (datthr.vel.a, columns = ['Variable','Value'])
+# print (df3)
+
+# ORIGINAL GRAPH FROM JS STUDY
 # graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89, 254.09)
 
-# GRAPH VELOCITY TRIANGLE FROM RESULTS
+
 graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel.Wu, two.vel.Wx, thr.vel.Wu, thr.vel.Wx)
+
+
+# plt.plot([1, 2, 3], [one.P0, two.P0, thr.P], 'k--')
+# plt.title("P0")
+
+
+# plt.plot([1, 2, 3], [one.T0, two.T0b, thr.P], 'k--')
+# plt.title("T0")

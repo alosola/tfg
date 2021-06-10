@@ -18,11 +18,6 @@ import aux_functions as f
 
 
 def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod):
-    """
-    Function to find the density rho for a certain point x, from the
-    temperature, mass flux, and area data.
-    Using an initial guess rhox_init, which is always less than rho0x
-    """
 
     def f_mach3(Mach3, one, two, thr, stator, rotor, gamma, cp, R, GR, phi, DeltaH_prod):
 
@@ -33,7 +28,6 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
         thr.Ts = f.P2T(thr.T0, thr.P, thr.P0, gamma)              # = thr.T0*(thr.P/thr.P0)**((gamma-1)/gamma)
 
         # find intermediate static pressure
-        two.P = GR*(one.P0-thr.P)+thr.P # Siverding rp definition
         two.P = one.P0*((GR-1)*(1-(thr.P/one.P0)**((gamma-1)/gamma) ) +1)**(gamma/(gamma-1))  # GP rp definition
         ### where does that definition come from? doublecheck GR definition
 
@@ -53,11 +47,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
         # speed of sound and Mach
         two.vel.a, two.vel.M = f.sonic(gamma, R, two.T, two.vel.V)            # = np.sqrt(gamma*R*two.T),    = two.vel.V/two.vel.a
 
-        # check if pressure calculated meets the restriction
-        two.T0b = two.T+two.vel.V**2/2/cp
-        ### include this in the check loop
-
-        two.P0 = f.T2P(two.P, two.T0, two.T, gamma)                  # = two.P*(two.T0/two.T)**(gamma/(gamma-1))
+#        two.P0 = f.T2P(two.P, two.T0, two.T, gamma)                  # = two.P*(two.T0/two.T)**(gamma/(gamma-1))
 
         # assume an two.alpha and project velocities
         two.vel.Vx, two.vel.Vu = f.velocity_projections(two.vel.V, two.alpha)
@@ -71,7 +61,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
         two.vel.W = f.mag(two.vel.Wu, two.vel.Wx)
 
         # relative inlet angle and relative Mach number
-        two.beta = np.arctan(two.vel.Wu/two.vel.Vx)
+#        two.beta = np.arctan(two.vel.Wu/two.vel.Vx)
         two.vel.Mr = two.vel.W/two.vel.a
 
         # relative total quantities at rotor inlet
@@ -91,16 +81,16 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
 
         # velocities
         thr.vel.W = f.isen_velocity(cp, thr.T0r, thr.T)                  # = np.sqrt(2*cp*(thr.T0r - thr.T))
-        thr.vel.Ws = f.isen_velocity(cp, thr.T0r, thr.Ts)                # = np.sqrt(2*cp*(thr.T0r - thr.Ts))
+#        thr.vel.Ws = f.isen_velocity(cp, thr.T0r, thr.Ts)                # = np.sqrt(2*cp*(thr.T0r - thr.Ts))
 
         # density
-        thr.rho = f.static_density(thr.P,thr.T,R)                    # = thr.P/thr.T/R
+#        thr.rho = f.static_density(thr.P,thr.T,R)                    # = thr.P/thr.T/R
 
         # speed of sound and relative mach number
         thr.vel.a, thr.vel.Mr = f.sonic(gamma, R, thr.T, thr.vel.W)                      # = np.sqrt(gamma*R*thr.T)
 
         # total absolute pressure
-        thr.P0r = f.T2P(thr.P, thr.T0r, thr.T, gamma)                           # = thr.P*(thr.T0r/thr.T)**(gamma/(gamma-1))
+#        thr.P0r = f.T2P(thr.P, thr.T0r, thr.T, gamma)                           # = thr.P*(thr.T0r/thr.T)**(gamma/(gamma-1))
 
         # assume a value for thr.beta
 
@@ -117,7 +107,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
         # assume axial speed constant
         thr.vel.Vx = thr.vel.Wx
         thr.vel.V = f.mag(thr.vel.Vx, thr.vel.Vu)                           # = np.sqrt(thr.vel.Vx**2 + thr.vel.Vu**2)
-        thr.alpha = np.arctan(thr.vel.Vu/thr.vel.Vx)
+#        thr.alpha = np.arctan(thr.vel.Vu/thr.vel.Vx)
         Mach3_calculated = thr.vel.V/thr.vel.a
 
         return Mach3_calculated - Mach3
@@ -129,9 +119,7 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
     thr.Ts = f.P2T(thr.T0, thr.P, thr.P0, gamma)              # = thr.T0*(thr.P/thr.P0)**((gamma-1)/gamma)
 
     # find intermediate static pressure
-    two.P = GR*(one.P0-thr.P)+thr.P # Siverding rp definition
     two.P = one.P0*((GR-1)*(1-(thr.P/one.P0)**((gamma-1)/gamma) ) +1)**(gamma/(gamma-1))  # GP rp definition
-    ### where does that definition come from? doublecheck GR definition
 
     # isentropic evolution in stator: absolute total temperature is same
     two.T0 = one.T0
@@ -148,10 +136,6 @@ def converge_mach3(Mach3_init, one, two, thr, stator, rotor, gamma, cp, R, GR, p
 
     # speed of sound and Mach
     two.vel.a, two.vel.M = f.sonic(gamma, R, two.T, two.vel.V)            # = np.sqrt(gamma*R*two.T),    = two.vel.V/two.vel.a
-
-    # check if pressure calculated meets the restriction
-    two.T0b = two.T+two.vel.V**2/2/cp
-    ### include this in the check loop
 
     two.P0 = f.T2P(two.P, two.T0, two.T, gamma)                  # = two.P*(two.T0/two.T)**(gamma/(gamma-1))
 
