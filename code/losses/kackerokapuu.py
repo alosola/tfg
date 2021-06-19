@@ -9,25 +9,16 @@ Program: inclusion of losses for 1D turbine
 File: kackerokapuu.py
 Descpription: functions for calculation of pressure loss coefficient by means
 of the Ainley/Mathieson/Dunham/Crane/Kacker/Okapuu method
-Souce: A Mean Line Prediction Method for Axial Flow Turbine Efficiency
+Source: A Mean Line Prediction Method for Axial Flow Turbine Efficiency
 
 """
 
 ## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
-import pandas as pd                  # library for tables and data import
 import matplotlib.pyplot as plt      # library for plots
+import scipy.interpolate
 
 
-# change default font for plots
-plt.rcParams["font.family"] = "sans"
-
-## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
-from definitions import pressure_losses
-
-
-P = np.genfromtxt('fig1.csv', delimiter=',')
-plt.scatter(P[:,0],P[:,1],s=2)
 
 # def kackerokapuu():
 
@@ -38,6 +29,28 @@ plt.scatter(P[:,0],P[:,1],s=2)
 #     return Y.tot
 
 
-# def profile_losses():
+def profile_losses_beta1_0(SC, alpha2):
 
-#     P = pd.read_csv("fig1.csv")
+    # alpha2 = np.degrees(alpha2)
+
+    ## NOTE: this entire function is defined for alpha2 in DEGREES, not RADIANS
+
+    x = np.genfromtxt('fig1_x.csv', delimiter=',')               # import SC vector
+    y = np.flip(np.genfromtxt('fig1_y.csv', delimiter=','))      # import alpha2 vector
+    Z = np.flip(np.genfromtxt('fig1_Zm.csv', delimiter=','), 1)  # import YP mesh
+
+    YP_spline =  scipy.interpolate.RectBivariateSpline(x, y, Z)  # create spline for evaluation
+    YP = YP_spline.ev(SC, alpha2)                                # evaluate at desired point
+
+    # print warking messages if values are outside recommended area
+    if ( SC < np.minimum(x) ) or ( SC > np.maximum(x) ) :
+        print("Warning: S/C value is outside the data range for profile pressure loss calculations. Program will contine with data extrapolation ")
+
+    if ( alpha2 < np.minimum(y) ) or ( alpha2 > np.maximum(y) ) :
+        print("Warning: alpha2 value is outside the data range for profile pressure loss calculations. Program will contine with data extrapolation ")
+
+    return YP
+
+
+
+profile_losses_beta1_0(0.5,50)

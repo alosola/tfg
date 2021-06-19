@@ -1,14 +1,13 @@
 close all
 
 
-P = zeros(75, 2, 7);
-P(:,:,1) = table2array(readtable('fig1_alpha80.csv'));
-P(:,:,2) = table2array(readtable('fig1_alpha75.csv'));
-P(:,:,3) = table2array(readtable('fig1_alpha70.csv'));
-P(:,:,4) = table2array(readtable('fig1_alpha65.csv'));
-P(:,:,5) = table2array(readtable('fig1_alpha60.csv'));
-P(:,:,6) = table2array(readtable('fig1_alpha50.csv'));
-P(:,:,7) = table2array(readtable('fig1_alpha40.csv'));
+P = zeros(75, 2, 6);
+P(:,:,1) = table2array(readtable('fig1_alpha70.csv'));
+P(:,:,2) = table2array(readtable('fig1_alpha65.csv'));
+P(:,:,3) = table2array(readtable('fig1_alpha60.csv'));
+P(:,:,4) = table2array(readtable('fig1_alpha55.csv'));
+P(:,:,5) = table2array(readtable('fig1_alpha50.csv'));
+P(:,:,6) = table2array(readtable('fig1_alpha40.csv'));
 
 for i=1:7
     figure(1)
