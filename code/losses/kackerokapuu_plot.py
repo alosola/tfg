@@ -17,9 +17,9 @@ import matplotlib.pyplot as plt      # library for plots
 
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 
-X = np.genfromtxt('fig1_Xm.csv', delimiter=',')
-Y = np.genfromtxt('fig1_Ym.csv', delimiter=',')
-Z = np.flip(np.genfromtxt('fig1_Zm.csv', delimiter=','), 1)
+X = np.genfromtxt('fig2_Xm.csv', delimiter=',')
+Y = np.genfromtxt('fig2_Ym.csv', delimiter=',')
+Z = np.flip(np.genfromtxt('fig2_Zm.csv', delimiter=','), 1)
 
 ax.plot_surface(X, Y, Z,cmap='viridis', edgecolor='none')
 ax.set_title('Surface plot')
