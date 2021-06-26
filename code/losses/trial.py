@@ -7,25 +7,21 @@ Created on Fri Jun 25 23:48:18 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import interpolate
 
 
 
-def secondary_losses_fAR(h_c):
 
-    if h_c > 2:
-        fAR = 1/h_c
-    else:
-        fAR = (1-0.25*np.sqrt(2-h_c))/h_c
+dataset = np.genfromtxt('dataset_trailing_edge.csv', delimiter=',')
+t_o = dataset[:,0]
+dphi = dataset[:,1]
 
-    return fAR
+s = interpolate.InterpolatedUnivariateSpline(t_o, dphi)
+xnew = np.linspace(np.amin(t_o), np.amax(t_o), 500)
+ynew = s(xnew)
 
-
-A = np.linspace(0.9,2.5,num=100)
-
-B = np.array([])
-
-for i in A:
-    B = np.append(B,secondary_losses_fAR(1/i))
+Dphi = np.float64(s(0.2105))
 
 
-plt.plot(A,B)
+plt.plot(t_o,dphi)
+plt.plot(xnew, ynew)

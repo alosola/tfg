@@ -27,7 +27,7 @@ def secondary_losses_fAR(h_c):
 
 
 def secondary_losses_AMDC(alpha2, alpha3, h_c):
-    ## confirm equations are correct with the KTH
+    ## confirm equations are correct with the KTH thesis
 
     fAR = secondary_losses_fAR(h_c)
 
