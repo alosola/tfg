@@ -63,9 +63,9 @@ beta3_init = np.radians(-65)      # rotor angle [deg->rad]
 
 
 RHT = 0.9                       # ratio hub/tip radius
-mdot = 0.777482308              # total mass flow [kg/s]
+mdot = 8                        # total mass flow [kg/s]
 one.rho = 0.98317               # inlet density [kg/m^3]
-thr.geo.Rh = 0.106              # radius of hub at rotor exit [m]
+thr.geo.Rh = 0.13               # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 if asusmed axial) [rad]
 
 

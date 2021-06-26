@@ -22,11 +22,10 @@ from solve_functions import solve_rhox
 from converge_mach3 import converge_mach3
 
 
-
+# initialize class variables
 one = plane()
 two = plane()
 thr = plane()
-
 rotor = component()
 stator = component()
 
@@ -42,14 +41,14 @@ DeltaH_prod = 390000              # enthalpy produced by turbine [J/Kg]
 
 
 # ASSUMPTIONS
-GR = 0.32                       # reaction degree [-]
-psi = 1.75                      # loading factor [-]
+GR = 0.4                            # reaction degree [-]
+psi = 1.75                           # loading factor [-]
 eta_stator_init = 0.888              # stator efficiency [-]
 eta_rotor_init = 0.808               # rotor efficiency [-]
 
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
-bounds_angles = ([np.radians(70),np.radians(-65)], [np.radians(75), np.radians(-60)])
+bounds_angles = ([np.radians(70),np.radians(-70)], [np.radians(75), np.radians(-60)])
 
 
 # FLUID PROPERTIES (TURBINE)
