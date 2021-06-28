@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 14 11:11:08 2021
+Created on Tue Jun 22 18:41:38 2021
 
 @author: alondra sola
 
 Project: turbine design tool (TFG)
-Program: inclusion of losses for 1D turbine
-File: main.py
+Program: modification for RR engine
+File: main02.py
 
 """
 
@@ -18,8 +18,9 @@ import aux_functions as f
 import plot_functions as graphs
 import tables_results as tab
 from definitions import plane, component
+from solve_functions import solve_rhox
 from converge_mach3 import converge_mach3
-from converge_geometry import converge_geometry
+
 
 # initialize class variables
 one = plane()
@@ -32,15 +33,15 @@ stator = component()
 ###################### GIVEN PARAMETERS AND ASSUMTIOSN ########################
 
 # GIVEN PARAMETERS (TURBINE)
-one.T0 = 1400                     # inlet total temperature (exit combustor) = T4t [K]
-one.P0 = 397194                   # inlet total pressure (exit combustor) [Pa]
-thr.P0 = 101325                   # outlet total pressure [Pa]
-thr.T0 = 1083.529                 # outlet total temperature [K]
-DeltaH_prod = 390000              # enthalpy produced by turbine [J/Kg]
+one.T0 = 1450                     # inlet total temperature (exit combustor) = T4t [K]
+one.P0 = 1.43e+06                 # inlet total pressure (exit combustor) [Pa]
+#thr.P0 = 101325                   # outlet total pressure [Pa]
+#thr.T0 = 1083.529                 # outlet total temperature [K]
+DeltaH_prod = 16.8e+06            # enthalpy produced by turbine [J/Kg]
 
 
 # ASSUMPTIONS
-GR = 0.4                            # reaction degree [-]
+GR = 0.4                             # reaction degree [-]
 psi = 1.75                           # loading factor [-]
 eta_stator_init = 0.888              # stator efficiency [-]
 eta_rotor_init = 0.808               # rotor efficiency [-]
@@ -62,9 +63,9 @@ beta3_init = np.radians(-65)      # rotor angle [deg->rad]
 
 
 RHT = 0.9                       # ratio hub/tip radius
-mdot = 8                        # total mass flow [kg/s]
+mdot = 0.777482308              # total mass flow [kg/s]
 one.rho = 0.98317               # inlet density [kg/m^3]
-thr.geo.Rh = 0.13               # radius of hub at rotor exit [m]
+thr.geo.Rh = 0.106              # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 if asusmed axial) [rad]
 
 
@@ -101,11 +102,35 @@ DeltaH_T = cp*(one.T0-thr.T0)                      # total temperatur formulatio
 # compute total condtions
 thr.T0, thr.P0 = f.total_conditions(thr.T, thr.vel.V, thr.P, cp, gamma)
 
+# blade geometry at 2
+two.geo.Rt, two.geo.Rh, two.geo.h, two.geo.Rm, two.geo.Dm, two.geo.A = f.blade_geometry(mdot, two.rho, two.vel.Vx, RHT)
 
-# establish geometry after assuming RHT
-converge_geometry(RHT, one, two, thr, mdot, R, gamma, cp)
+# rotational velocity
+two.vel.Omega = two.vel.U/two.geo.Rm
+two.vel.RPM = f.RPM(two.vel.Omega)
 
+# massflow and characteristics at inlet
+one.rho0 = f.static_density(one.P0, one.T0, R)                                  # = one.P0/one.T0/R
+one.rho = solve_rhox(0.9999*one.rho0, one.rho0, one.T0, mdot,  two.geo.A, gamma, cp)  # iteraciones hasta converger
+one.vel.V = np.sqrt(2*cp*one.T0*(1-(one.rho/one.rho0)**(gamma-1)))
+one.vel.Vx = one.vel.V
+one.T = one.T0 - one.vel.V**2/2/cp
+one.P = f.T2P(one.P0, one.T, one.T0, gamma)                     # = one.P0*(one.T/one.T0)**(gamma/(gamma-1)) # isentropic
+one.vel.a, one.vel.M = f.sonic(gamma, R, one.T, one.vel.V)
+one.geo.A = mdot/one.rho/one.vel.V
 
+# blade geometry at 1
+one.geo.Rt, one.geo.Rh, one.geo.h, one.geo.Rm, one.geo.Dm, one.geo.A = f.blade_geometry(mdot, one.rho, one.vel.V, RHT)
+
+# blade geometry at 3
+# what
+thr.geo.A = mdot/thr.vel.Vx/thr.rho
+thr.geo.h = thr.geo.A/np.pi/2/two.geo.Rm
+thr.geo.Rt = two.geo.Rm+thr.geo.h/2
+thr.geo.Dm = thr.geo.Rt*2 - thr.geo.h
+thr.geo.Rm = thr.geo.Dm/2
+
+thr.vel.Omega = thr.vel.U/thr.geo.Rm
 
 GR_enthalpy = (two.T - thr.T)/(two.T0 - thr.T0) # Assume v1 = v3, not right
 Deltabeta = two.beta - thr.beta # por qué no negativo?
@@ -144,8 +169,6 @@ opt_pitch_chord = 0.6*np.cos(stg)/2/np.cos(two.alpha)**2/(one.vel.V/two.vel.Vx*n
 
 
 
-# calculate pressure loss coefficient YP = tpl using Kacker-Okapuu
-# rotor.tplKC = kackerokapuu(component, S, alpha2, alpha3, t, c, bx, h, two.vel.M, thr.vel.M, two.P, thr.P, gamma, RHT, Rec, t_o)
 
 
 

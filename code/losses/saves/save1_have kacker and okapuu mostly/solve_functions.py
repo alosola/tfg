@@ -18,23 +18,21 @@ from scipy.optimize import fsolve, least_squares
 import aux_functions as f
 
 
-def solve_rhox(rho_init, rho0, T0, mdot, Ay, gamma, cp):
+def solve_rhox(rhox_init, rho0x, T0x, mdot, Ay, gamma, cp):
     """
     Function to find the density rho for a certain point x, from the
     temperature, mass flux, and area data.
     Using an initial guess rhox_init, which is always less than rho0x
     """
 
-    def f_rho(rho, rho0, T0, mdot, Ay, gamma, cp):
-        V = np.sqrt(2*cp*T0*(1-(rho/rho0)**(gamma-1)))
-        A = mdot/rho/V
-        return Ay-A
+    def f_rhox(rhox, rho0x, T0x, mdot, Ay, gamma, cp):
+        Vx = np.sqrt(2*cp*T0x*(1-(rhox/rho0x)**(gamma-1)))
+        Ax = mdot/rhox/Vx
+        return Ay-Ax
 
-    rho = fsolve(f_rho,rho_init,args=(rho0, T0, mdot, Ay, gamma, cp))[0]
-    V = np.sqrt(2*cp*T0*(1-(rho/rho0)**(gamma-1)))
-    A = mdot/rho/V
+    rhox = fsolve(f_rhox,rhox_init,args=(rho0x, T0x, mdot, Ay, gamma, cp))[0]
 
-    return rho, V, A;
+    return rhox;
 
 
 
