@@ -89,7 +89,7 @@ def solve_angles(angles_init, one, two, thr, stator, rotor, gamma, cp, R, GR, ps
         # find work, check for angle iteration
         DeltaH_calculated = two.vel.U*(two.vel.Vu - thr.vel.Vu)
 
-        diff = DeltaH_calculated - DeltaH_prod
+        diff = abs(DeltaH_calculated - DeltaH_prod)
 
 
         return np.array([diff[0], 0])

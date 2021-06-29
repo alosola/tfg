@@ -21,6 +21,7 @@ from definitions import plane, component
 from converge_mach3 import converge_mach3
 from solve_functions import solve_geometry
 from check_limits import check_limits
+from converge_efficiencies import converge_efficiencies
 
 
 # initialize class variables
@@ -83,63 +84,18 @@ thr.vel.M = Mach3_init
 two.alpha = alpha2_init
 thr.beta = beta3_init
 
-stator.eta = eta_stator_init
-rotor.eta = eta_rotor_init
+etas = np.array([eta_stator_init, eta_rotor_init])
+converge_efficiencies(etas, stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot)
 
 
-# 1.
-# mach 3 converge until calculated value meets the initial guess
-# inside of this function, alpha2 and beta 3 are also set so that the DeltaH is met
-one, two, thr, stator, rotor = converge_mach3(one, two, thr, stator, rotor, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles)
-
-# 1.2
-# calculate loss coefficients
-stator = f.losses(two.vel.V, two.vel.Vs, one.P0, two.P0, two.P, stator)
-rotor = f.losses(thr.vel.W, thr.vel.Ws, two.P0r, thr.P0r, thr.P, rotor)
 
 # 1.3
 # DeltaH_calculations
 DeltaH_calc = thr.vel.U*(two.vel.Vu-thr.vel.Vu)    # euler formulation
 DeltaH_T = cp*(one.T0-thr.T0)                      # total temperature formulation
 
-# 1.4
-# compute total condtions
-thr.T0, thr.P0 = f.total_conditions(thr.T, thr.vel.V, thr.P, cp, gamma)
 
 
-# 2.
-# establish geometry after assuming RHT
-solve_geometry(RHT, one, two, thr, mdot, R, gamma, cp)
-
-# 2.2
-# check limits
-pass_limits = check_limits(two, thr)
-
-# if np.amin(pass_limits) == 'No':
-#     print('At least one of the check values is outside the defined limits.')
-#     repeat = f.yes_or_no('Do you want to repead the exercise with 0.9 the DeltaH?')
-
-
-
-# SOODERBERG CORRELATION LOSSES
-# rotor
-thr.H = thr.T*cp
-thr.Hs = thr.Ts*cp
-epsr = 2*(thr.H - thr.Hs)/thr.vel.W**2
-#stator
-H2 = two.T*cp
-two.Hs = two.Ts*cp
-epse = 2*(H2 - two.Hs)/two.vel.V**2
-
-# efficiencies
-one.H0 = cp*one.T0
-thr.H0 = cp*thr.T0
-thr.Tss = one.T0*(thr.P/one.P0)**((gamma-1)/gamma)
-thr.Hs = cp*thr.Ts
-stator.eta = (one.H0 - thr.H0)/(one.H0 - (thr.Hs+thr.vel.V**2/2))
-rotor.eta = (one.H0 - thr.H0)/(one.H0 - thr.Hs)
-
-rotoreta = (one.T0 - thr.T0)/()
 
 
 epsp = (two.vel.Vs**2 - two.vel.V**2)/two.vel.V**2
