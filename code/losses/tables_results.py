@@ -83,5 +83,15 @@ def results_3(thr, Mach3_init,tpl_rotor):
 
 
 
-
+def print_limits(limits, values, checks):
+    data = {'Variable': ['Turning (alpha)','Turning (beta)','Height ratio','Mach 2', 'Mach 2r','Mach 3','Mach3r','Beta 2'],
+             'Min limit': limits[0,:],
+             'Max limit': limits[1,:],
+             'Value':     values[0,:],
+             'Unit':     ['deg','deg','-','-','-','-','-','deg'],
+             'Within limits?': checks[0,:]
+             }
+    df = pd.DataFrame (data, columns = ['Variable','Min limit','Max limit','Value','Unit','Within limits?'])
+    print('LIMIT CHECKS')
+    print (df ,'\n')
 
