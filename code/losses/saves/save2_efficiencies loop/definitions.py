@@ -55,10 +55,6 @@ class geometry():
         self.Rm = None     # mean radius [m]
         self.Dm = None     # mean diameter [m]
         self.A = None      # cross-sectional area [m^2]
-        self.c = None      # chord [m]
-        self.s = None      # pitch [m]
-        self.t = None      # trailing edge thickness [m]
-
 
     # def mean_radius(self):
     #     self.mean = (self.Rh + self.Rt)/2

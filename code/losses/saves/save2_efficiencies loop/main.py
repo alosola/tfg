@@ -84,7 +84,6 @@ thr.vel.M = Mach3_init
 two.alpha = alpha2_init
 thr.beta = beta3_init
 
-# using the initial efficiencies, calculate the cycle
 etas = np.array([eta_stator_init, eta_rotor_init])
 converge_efficiencies(etas, stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot)
 

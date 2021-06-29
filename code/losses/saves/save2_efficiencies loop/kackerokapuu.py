@@ -65,7 +65,7 @@ def reynolds_correction(Rec):
 
 
 
-def kackerokapuu(component, s, alpha2, alpha3, t, c, bx, h, M2, M3, P2, P3, gamma, RHT, Rec, t_o):
+def kackerokapuu(component, S, alpha2, alpha3, t, c, bx, h, M2, M3, P2, P3, gamma, RHT, Rec, t_o):
 
     """
     Function for calculation of total losses using Kacker-Okapuu formulation
@@ -87,7 +87,7 @@ def kackerokapuu(component, s, alpha2, alpha3, t, c, bx, h, M2, M3, P2, P3, gamm
         K = 5.2
 
 
-    YP = profile_losses(s/c, alpha3, t/c, alpha2, M2, M3, K, P2, P3, gamma, RHT)
+    YP = profile_losses(S/c, alpha3, t/c, alpha2, M2, M3, K, P2, P3, gamma, RHT)
     fRe = reynolds_correction(Rec)
     YS = secondary_losses(alpha2, alpha3, h/c, bx, h, M2, M3)
     YTC = tip_clearance()
@@ -104,24 +104,6 @@ def kackerokapuu(component, s, alpha2, alpha3, t, c, bx, h, M2, M3, P2, P3, gamm
 
 
 
-
-S = 0.008549314    # pitch [m]
-alpha2 = np.radians(75.3)
-alpha3 = np.radians(65)
-c = 0.017007665 # chord
-t = c/10 # max thickness
-h = 0.011906101
-bx = 0.6*h
-M2 = 1.11
-M3 = 0.46
-P2 = 153781.890
-P3 = 90483.172
-gamma = 1.3
-RHT  = 0.9
-Re = 42838
-t_o = 0.2
-
-loss_rotor = kackerokapuu('rotor', S, alpha2, alpha3, t, c, bx, h, M2, M3, P2, P3, gamma, RHT, Re, t_o)
 
 
 

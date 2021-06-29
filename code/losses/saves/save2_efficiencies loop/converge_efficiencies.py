@@ -50,8 +50,6 @@ def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma
         diff1 = abs(stator.eta - etas[0])
         diff2 = abs(rotor.eta - etas[1])
 
-        print(diff1, diff2)
-
         return np.array([diff1, diff2])
 
 
