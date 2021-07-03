@@ -36,6 +36,7 @@ class plane():
         self.vel = velocity()
         self.alpha = None
         self.beta = None
+        self.Re = None
 
 class component():
     def __init__(self):
@@ -43,7 +44,7 @@ class component():
         self.xi = None     # kinetic loss coefficient
         self.lrt = None    # loss ??
         self.tpl = None    # total pressure loss coefficient (calculated with pressures)
-        self.tplKC = None  # total pressure loss coefficient (calculated with Kacker-Okapuu)
+        self.omegaKC = None  # total pressure loss coefficient (calculated with Kacker-Okapuu)
         self.omega = None
 
 
@@ -58,7 +59,10 @@ class geometry():
         self.c = None      # chord [m]
         self.s = None      # pitch [m]
         self.t = None      # trailing edge thickness [m]
-
+        self.hc = None     # height/chord ratio [-]
+        self.phi = None    # stagger angle [º]
+        self.cx = None     # axial chord [m]
+        self.to = None     # trailing-edge-thickness to throat-opening ratio [-]
 
     # def mean_radius(self):
     #     self.mean = (self.Rh + self.Rt)/2

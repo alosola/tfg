@@ -111,6 +111,8 @@ def solve_geometry(RHT, one, two, thr, mdot, R, gamma, cp):
 
     # blade geometry at 2
     f.blade_geometry(mdot, two.rho, two.vel.Vx, RHT, two)
+    two.geo.c = two.geo.h/two.geo.hc
+    two.geo.bx, two.geo.phi = f.axial_chord(two.geo.c, one.alpha, two.alpha)
 
     # rotational velocity
     two.vel.Omega = two.vel.U/two.geo.Rm
@@ -134,6 +136,12 @@ def solve_geometry(RHT, one, two, thr, mdot, R, gamma, cp):
     thr.geo.Rt = two.geo.Rm+thr.geo.h/2
     thr.geo.Dm = thr.geo.Rt*2 - thr.geo.h
     thr.geo.Rm = thr.geo.Dm/2
+    thr.geo.c = thr.geo.h/thr.geo.hc
+    thr.geo.bx, thr.geo.phi = f.axial_chord(thr.geo.c, thr.alpha, thr.alpha)
 
     thr.vel.Omega = thr.vel.U/thr.geo.Rm
     thr.vel.RPM = f.RPM(thr.vel.Omega)
+
+    # compute pitch with soderberg/zweiffel
+    two.geo.s = f.pitch(one, two)
+    thr.geo.s = f.pitch(two, thr)

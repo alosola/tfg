@@ -13,7 +13,7 @@ Description: contains definitions of thermodynamic functions used in the
 """
 
 import numpy as np                   # library for math and calculation functions
-
+import scipy.interpolate
 
 
 def blade_geometry(mdot, rho, Vx, RHT, stage):
@@ -110,16 +110,70 @@ def yes_or_no(question):
 
 
 
+def stagger_angle(alpha2, alpha3):
+    x = np.genfromtxt('stg_x.csv', delimiter=',')               # import SC vector
+    y = np.genfromtxt('stg_y.csv', delimiter=',')      # import alpha2 vector
+    z = np.flip(np.genfromtxt('stg_Zm.csv', delimiter=','),0)  # import YP mesh
+
+    phi_spline = scipy.interpolate.RectBivariateSpline(x, y, z)  # create spline for evaluation
+    phi = phi_spline.ev(alpha2, alpha3)
+
+    return np.radians(phi)
+
+
+def axial_chord(c, alpha2, alpha3):
+
+    phi = stagger_angle(alpha2, alpha3)
+
+    cx = c*np.cos(phi)
+
+    return cx, phi
+
+
+def zweiffel(beta2, alpha2, alpha3):
+
+    alpha2 = np.degrees(alpha2)
+    alpha3 = np.degrees(alpha3)
+
+    x = np.genfromtxt('stg_x.csv', delimiter=',')               # import SC vector
+    y = np.genfromtxt('stg_y.csv', delimiter=',')      # import alpha2 vector
+    z = np.flip(np.genfromtxt('stg_Zm.csv', delimiter=','),0)  # import YP mesh
+
+    phi_spline = scipy.interpolate.RectBivariateSpline(x, y, z)  # create spline for evaluation
+    phi = phi_spline.ev(alpha2, alpha3)
+
+
+    sc0 = 0.427 + (90-alpha2)/58 - ((90-alpha2)/93)**2
+    sc1 = 0.224 + (1.575 - (90-alpha2)/90)*(90-alpha2)/90
+
+    xi = beta2/alpha2
+
+    sc = sc0 + (sc1 + sc0)*xi**2*np.sign(xi)
 
 
 
+def pitch(A, B):
+    alphaA = np.abs(B.alpha)
+    alphaB = np.abs(B.alpha)
+
+    pitch_chord_opt = 0.8/2/(np.tan(alphaA) + np.tan(alphaB))/np.cos(alphaB)**2
+    stagger = stagger_angle(alphaA, alphaB)
+    phi = 0.6/np.cos(stagger)*np.cos(alphaB)**2*(A.vel.Vx/B.vel.Vx*np.tan(alphaA)+np.tan(alphaB))*B.geo.h/A.geo.h*B.P0/A.P0
+
+    pitch = B.geo.c*phi
+
+    return pitch
 
 
 
+def reynolds(two, thr):
+    two.Re = 134387
+    thr.Re = 42839
 
 
-
-
+def trailing_throat(two, thr):
+    two.geo.to = 0.15
+    thr.geo.to = 0.15
 
 # def isen_evolution(x, M, gamma):
 #     x0 = x*(1 + M**2*(gamma-1)/2)

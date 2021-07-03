@@ -70,11 +70,12 @@ beta3_init = np.radians(-65)      # rotor angle [deg->rad]
 
 # OTHER ASSUMPTIONS
 RHT = 0.9                       # ratio hub/tip radius
-mdot = 8                        # total mass flow [kg/s]
+mdot = 0.777482308              # total mass flow [kg/s]
 one.rho = 0.98317               # inlet density [kg/m^3]
 thr.geo.Rh = 0.13               # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 because flow is axial) [rad]
-
+height_chord_stator = 0.7
+height_chord_rotor = 1.4
 
 
 ## ok ok here we go
@@ -83,6 +84,8 @@ one.alpha = 0                   # stator inlet angle (0 because flow is axial) [
 thr.vel.M = Mach3_init
 two.alpha = alpha2_init
 thr.beta = beta3_init
+two.geo.hc = height_chord_stator
+thr.geo.hc = height_chord_rotor
 
 # using the initial efficiencies, calculate the cycle
 etas = np.array([eta_stator_init, eta_rotor_init])
@@ -135,3 +138,8 @@ graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89,
 graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel.Wu, two.vel.Wx, thr.vel.Wu, thr.vel.Wx)
 
 
+print("Stator pressure loss: ", stator.omega)
+print("Rotor pressure loss: ", rotor.omega)
+
+print("Stator efficiency: ", stator.eta)
+print("Rotor efficiency: ", rotor.eta)

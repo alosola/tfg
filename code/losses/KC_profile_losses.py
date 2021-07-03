@@ -70,7 +70,26 @@ def profile_losses_alpha2_alpha3(S_C, alpha3):
 
 
 
-def profile_losses_AMDC(S_C, alpha3, t_c, alpha2):
+
+
+def thickness_chord_ratio(deltabeta):
+
+    deltabeta = abs(np.degrees(deltabeta))
+
+    if deltabeta > 120:
+        t_c = 0.25
+    if deltabeta < 40:
+        t_c = 0.15
+    else:
+        t_c = 0.15 + 1.25e-03*(deltabeta - 40)
+
+    return t_c
+
+
+
+def profile_losses_AMDC(S_C, alpha3, alpha2):
+
+    t_c = thickness_chord_ratio(alpha2 - alpha3)
 
     # AMDC profile loss correlation
 
@@ -88,7 +107,7 @@ def profile_losses_AMDC(S_C, alpha3, t_c, alpha2):
 def profile_losses_YShock(M2, M3, K, RHT, gamma, P2, P3):
 
     M2H = M2*(1+K*np.absolute(RHT-1)**2.2)
-    dp_hub = 0.75*(M2H - 0.4)**1.75
+    dp_hub = 0.5 #0.75*(M2H - 0.4)**1.75
     dp_shock = dp_hub*RHT
 
     def f(M, gamma):
@@ -109,9 +128,9 @@ def losses_KP(M2, M3):
     return KP
 
 
-def profile_losses(S_C, alpha3, t_c, alpha2, M2, M3, K, P2, P3, gamma, RHT):
+def profile_losses(S_C, alpha3, alpha2, M2, M3, K, P2, P3, gamma, RHT):
 
-    YP_AMDC = profile_losses_AMDC(S_C, alpha3, t_c, alpha2)
+    YP_AMDC = profile_losses_AMDC(S_C, alpha3, alpha2)
     KP = losses_KP(M2, M3)
     YShock = profile_losses_YShock(M2, M3, K, RHT, gamma, P2, P3)
     YP = 0.914*(2/3*YP_AMDC*KP + YShock)

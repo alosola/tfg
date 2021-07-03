@@ -16,6 +16,7 @@ from converge_mach3 import converge_mach3
 from solve_functions import solve_geometry
 from check_limits import check_limits
 from scipy.optimize import fsolve
+from kackerokapuu import kackerokapuu
 
 def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot):
 
@@ -47,8 +48,17 @@ def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma
         stator.eta = (one.T0 - thr.T0)/(one.T0 - (thr.Ts+thr.vel.V**2/2/cp))
         rotor.eta = (one.T0 - thr.T0)/(one.T0 - thr.Ts)
 
-        diff1 = abs(stator.eta - etas[0])
-        diff2 = abs(rotor.eta - etas[1])
+        # calculate reynolds numbers
+        f.reynolds(two, thr)
+        f.trailing_throat(two, thr)
+
+        # use kacker-okapuu to calculate losses in stator and rotor
+        stator.omegaKC = kackerokapuu('stator', two.geo.s, abs(one.alpha), abs(two.beta), two.geo.c, two.geo.bx, two.geo.h, one.vel.M, two.vel.M, one.P, two.P, gamma, RHT, two.Re, two.geo.to)
+        rotor.omegaKC  = kackerokapuu('rotor',  thr.geo.s, abs(two.alpha), abs(thr.beta), thr.geo.c, thr.geo.bx, thr.geo.h, two.vel.M, thr.vel.M, two.P, thr.P, gamma, RHT, thr.Re, thr.geo.to)
+
+
+        diff1 = abs(stator.omega - stator.omegaKC)
+        diff2 = abs(rotor.omega  - rotor.omegaKC)
 
         print(diff1, diff2)
 
