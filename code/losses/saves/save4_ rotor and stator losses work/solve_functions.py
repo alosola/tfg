@@ -138,7 +138,6 @@ def solve_geometry(RHT, one, two, thr, mdot, R, gamma, cp):
     thr.geo.Rm = thr.geo.Dm/2
     thr.geo.c = thr.geo.h/thr.geo.hc
     thr.geo.bx, thr.geo.phi = f.axial_chord(thr.geo.c, thr.alpha, thr.alpha)
-    thr.geo.Rh = thr.geo.Rt - thr.geo.h
 
     thr.vel.Omega = thr.vel.U/thr.geo.Rm
     thr.vel.RPM = f.RPM(thr.vel.Omega)

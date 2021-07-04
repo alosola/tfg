@@ -171,6 +171,9 @@ def reynolds(two, thr):
     thr.Re = 42839
 
 
+def trailing_throat(two, thr):
+    two.geo.to = 0.25
+    thr.geo.to = 0.25
 
 # def isen_evolution(x, M, gamma):
 #     x0 = x*(1 + M**2*(gamma-1)/2)

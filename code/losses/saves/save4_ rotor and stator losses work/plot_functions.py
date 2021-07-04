@@ -32,10 +32,9 @@ def velocity_triangle(V2u, V2x, V3u, V3x, W2u, W2x, W3u, W3x):
     arrayN = np.array(['V2', 'W2', 'U2', 'V3', 'W3', 'U3'])
     arrayT = [arrayV2, arrayW2, arrayU2, arrayV3, arrayW3, arrayU3]
 
-    X = 1.2*np.amax(arrayT)
-    Y = 1.2*V3x
-    x = np.linspace(-X,X,100)
-    y = np.linspace(-0.1*Y,Y,100)
+
+    x = np.linspace(-800,800,100)
+    y = np.linspace(-10,400,100)
 
     i = 0
     for n in arrayT:
@@ -72,36 +71,25 @@ def turbine_geometry(one, two, thr):
     plt.show()
 
 
-def geometry(one, two, thr):
+def geometry(two, thr):
 
     fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111)
+    ax2 = fig2.add_subplot(111, aspect='equal')
+    plt.axis([-0.1,0.8,0,0.2])
 
-    Xstator = 0
-    Wstator = two.geo.c
-    Xrotor = Xstator + Wstator + Wstator/5
-    Wrotor = thr.geo.c
+    Xrotor = 0
+    width = 0.5
 
+    rotor = [[Xrotor, two.geo.Rh], [Xrotor, two.geo.Rt], [Xrotor+width, thr.geo.Rt], [Xrotor+width, thr.geo.Rh], [Xrotor,two.geo.Rh]] #the points to trace the edges.
+    polygon= plt.Polygon(rotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
+    ax2.add_patch(polygon)
 
-    stator = [[Xstator, one.geo.Rh], [Xstator, one.geo.Rt], [Xstator+Wstator, two.geo.Rt], [Xstator+Wstator, two.geo.Rh], [Xstator,one.geo.Rh]] #the points to trace the edges.
-    polygon_stator = plt.Polygon(stator,  fill=True, edgecolor=None, facecolor=(151/222, 178/222, 1))
-    ax2.add_patch(polygon_stator)
+    # antirotor = rotor
+    # for i in np.array([0,1,2,3,4]):
+    #     antirotor[i][1] = -rotor[i][1]
 
-
-    rotor = [[Xrotor, two.geo.Rh], [Xrotor, two.geo.Rt], [Xrotor+Wrotor, thr.geo.Rt], [Xrotor+Wrotor, thr.geo.Rh], [Xrotor,two.geo.Rh]] #the points to trace the edges.
-    polygon_rotor = plt.Polygon(rotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
-    ax2.add_patch(polygon_rotor)
-
-    antistator = [[Xstator, -one.geo.Rt], [Xstator, -one.geo.Rh], [Xstator+Wstator, -two.geo.Rh], [Xstator+Wstator, -two.geo.Rt], [Xstator,-one.geo.Rt]] #the points to trace the edges.
-    polygon_antistator = plt.Polygon(antistator,  fill=True, edgecolor=None, facecolor=(151/222, 178/222, 1))
-    ax2.add_patch(polygon_antistator)
-
-    antirotor = [[Xrotor, -two.geo.Rt], [Xrotor, -two.geo.Rh], [Xrotor+Wrotor, -thr.geo.Rh], [Xrotor+Wrotor, -thr.geo.Rt], [Xrotor,-two.geo.Rt]] #the points to trace the edges.
-    polygon_antirotor = plt.Polygon(antirotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
-    ax2.add_patch(polygon_antirotor)
-
-
-    plt.axis([-0.3*Xrotor,(Xrotor + Wrotor + 0.3*Xrotor),1.3*thr.geo.Rt,-1.3*thr.geo.Rt])
+    # antipolygon= plt.Polygon(antirotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
+    # ax2.add_patch(antipolygon)
 
 
     fig2.savefig('graph_geometry.png', dpi=90, bbox_inches='tight')

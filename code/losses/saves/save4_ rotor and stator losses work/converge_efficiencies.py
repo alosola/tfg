@@ -50,6 +50,7 @@ def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma
 
         # calculate reynolds numbers
         f.reynolds(two, thr)
+        f.trailing_throat(two, thr)
 
         # use kacker-okapuu to calculate losses in stator and rotor
         stator.omegaKC = kackerokapuu('stator', two.geo.s, abs(one.alpha), abs(two.beta), two.geo.c, two.geo.bx, two.geo.h, one.vel.M, two.vel.M, one.P, two.P, gamma, RHT, two.Re, two.geo.to)

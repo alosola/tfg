@@ -12,7 +12,6 @@ File: main.py
 
 ## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
-import matplotlib.pyplot as plt
 
 ## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
 import aux_functions as f
@@ -41,11 +40,7 @@ one.T0 = 1400                     # inlet total temperature (exit combustor) = T
 one.P0 = 397194                   # inlet total pressure (exit combustor) [Pa]
 thr.P0 = 101325                   # outlet total pressure [Pa]
 thr.T0 = 1083.529                 # outlet total temperature [K]
-DeltaH_prod = 390000              # enthalpy produced by turbine [J/Kg]
-
-
-mdot = 0.777482308             # total mass flow [kg/s]
-one.rho = 0.98317                 # inlet density [kg/m^3]
+DeltaH_prod = 400000              # enthalpy produced by turbine [J/Kg]
 
 
 # FLUID PROPERTIES (TURBINE)
@@ -54,29 +49,34 @@ cp = 1240                # [J/kg/K]
 R = 286.1538462          # [J/kg/K]
 
 
-# INITIAL GUESSES
-Mach3_init = 0.5                  # rotor/turbine exit Mach number [-]
-alpha2_init  = np.radians(75)     # stator angle [deg->rad]
-beta3_init = np.radians(-65)      # rotor angle [deg->rad]
+
+
+# ASSUMPTIONS
+GR = 0.4                            # reaction degree [-]
+psi = 1.75                           # loading factor [-]
 eta_stator_init = 0.919              # stator efficiency [-]
 eta_rotor_init = 0.827               # rotor efficiency [-]
+
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
 bounds_angles = ([np.radians(70),np.radians(-70)], [np.radians(75), np.radians(-60)])
 
 
 
+# INITIAL GUESSES
+Mach3_init = 0.5                  # rotor/turbine exit Mach number [-]
+alpha2_init  = np.radians(75)     # stator angle [deg->rad]
+beta3_init = np.radians(-65)      # rotor angle [deg->rad]
+
+# OTHER ASSUMPTIONS
+RHT = 0.7                       # ratio hub/tip radius
+mdot = 0.777482308              # total mass flow [kg/s]
+one.rho = 0.98317               # inlet density [kg/m^3]
+# thr.geo.Rh = 0.13               # radius of hub at rotor exit [m]
 one.alpha = 0                   # stator inlet angle (0 because flow is axial) [rad]
+height_chord_stator = 0.7
+height_chord_rotor = 1.4
 
-
-
-# ASSUMPTIONS
-GR = 0.4                          # reaction degree [-]
-psi = 1.75                        # loading factor [-]
-RHT = 0.7                         # ratio hub/tip radius
-h_c_stator = 0.7                  # height/chord ratio stator [-]
-h_c_rotor = 1.4                   # height/chord ratio rotor [-]
-t_o = 0.25                        # trailing-egde thickness to throat opening ratio [-]
 
 ## ok ok here we go
 
@@ -84,10 +84,8 @@ t_o = 0.25                        # trailing-egde thickness to throat opening ra
 thr.vel.M = Mach3_init
 two.alpha = alpha2_init
 thr.beta = beta3_init
-two.geo.hc = h_c_stator
-thr.geo.hc = h_c_rotor
-two.geo.to = t_o
-thr.geo.to = t_o
+two.geo.hc = height_chord_stator
+thr.geo.hc = height_chord_rotor
 
 # using the initial efficiencies, calculate the cycle
 etas = np.array([eta_stator_init, eta_rotor_init])
@@ -131,59 +129,20 @@ GR_final = (two.T - thr.T)/(one.T - thr.T)
 DeltaW = thr.vel.W - two.vel.W
 h3h2 = thr.geo.h/two.geo.h
 
-# %% Tables and results
 tab.print_all_tables(one, two, thr, Mach3_init, alpha2_init, beta3_init, DeltaH_prod, DeltaH_calc, DeltaH_T, mdot, Deltabeta, psi, GR, h3h2, stator, rotor, eta_stator_init, eta_rotor_init)
 
-print("Stator pressure loss: ", round(stator.omegaKC,2))
-print("Rotor pressure loss: ", round(rotor.omegaKC,2))
-
-print("Stator efficiency: ", round(stator.eta,2))
-print("Rotor efficiency: ", round(rotor.eta,2))
-
-# %% GRAPHS
-
-# ORIGINAL GRAPH FROM JS GAS GENERATOR STUDY
+# # ORIGINAL GRAPH FROM JS GAS GENERATOR STUDY
 # graphs.velocity_triangle(753.18, 197.59, -71.35, 254.09 ,279.64, 197.6, -544.89, 254.09)
 
 # GRAPH VELOCITY TRIANGLE FROM RESULTS
 graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel.Wu, two.vel.Wx, thr.vel.Wu, thr.vel.Wx)
 
 
-# %% GRAPH ROTOR GEOMETRY
-graphs.geometry(one, two, thr)
+# GRAPH ROTOR GEOMETRY
+graphs.geometry(two, thr)
 
-# fig2 = plt.figure()
-# ax2 = fig2.add_subplot(111)
+print("Stator pressure loss: ", stator.omegaKC)
+print("Rotor pressure loss: ", rotor.omegaKC)
 
-# Xstator = 0
-# Wstator = two.geo.c
-# Xrotor = Xstator + Wstator + Wstator/5
-# Wrotor = thr.geo.c
-
-
-# stator = [[Xstator, one.geo.Rh], [Xstator, one.geo.Rt], [Xstator+Wstator, two.geo.Rt], [Xstator+Wstator, two.geo.Rh], [Xstator,one.geo.Rh]] #the points to trace the edges.
-# polygon_stator = plt.Polygon(stator,  fill=True, edgecolor=None, facecolor=(151/222, 178/222, 1))
-# ax2.add_patch(polygon_stator)
-
-
-# rotor = [[Xrotor, two.geo.Rh], [Xrotor, two.geo.Rt], [Xrotor+Wrotor, thr.geo.Rt], [Xrotor+Wrotor, thr.geo.Rh], [Xrotor,two.geo.Rh]] #the points to trace the edges.
-# polygon_rotor = plt.Polygon(rotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
-# ax2.add_patch(polygon_rotor)
-
-# antistator = [[Xstator, -one.geo.Rt], [Xstator, -one.geo.Rh], [Xstator+Wstator, -two.geo.Rh], [Xstator+Wstator, -two.geo.Rt], [Xstator,-one.geo.Rt]] #the points to trace the edges.
-# polygon_antistator = plt.Polygon(antistator,  fill=True, edgecolor=None, facecolor=(151/222, 178/222, 1))
-# ax2.add_patch(polygon_antistator)
-
-# antirotor = [[Xrotor, -two.geo.Rt], [Xrotor, -two.geo.Rh], [Xrotor+Wrotor, -thr.geo.Rh], [Xrotor+Wrotor, -thr.geo.Rt], [Xrotor,-two.geo.Rt]] #the points to trace the edges.
-# polygon_antirotor = plt.Polygon(antirotor,  fill=True, edgecolor=None, facecolor=(173/217, 1, 165/217))
-# ax2.add_patch(polygon_antirotor)
-
-
-# plt.axis([-0.3*Xrotor,(Xrotor + Wrotor + 0.3*Xrotor),1.3*thr.geo.Rt,-1.3*thr.geo.Rt])
-
-
-# plt.show()
-
-
-
-
+print("Stator efficiency: ", stator.eta)
+print("Rotor efficiency: ", rotor.eta)
