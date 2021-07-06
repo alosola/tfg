@@ -12,12 +12,13 @@ File: main.py
 
 ## IMPORT NECESSARY LIBRARIES
 import numpy as np                   # library for math and calculation functions
+import sys
 
 ## IMPORT FUNCTIONS AND DEFINITIONS FROM OTHER PYTHON FILES
 import plot_functions as graphs
 import tables_results as tab
 from definitions import plane, component
-from converge_efficiencies import converge_efficiencies
+from converge_efficiencies import converge_efficiencies, converge_efficiencies_limits
 from no_losses import no_losses
 
 
@@ -37,13 +38,14 @@ one.T0 = 1400                     # inlet total temperature (exit combustor) = T
 one.P0 = 397194                   # inlet total pressure (exit combustor) [Pa]
 thr.P0 = 101325                   # outlet total pressure [Pa]
 thr.T0 = 1083.529                 # outlet total temperature [K]
-DeltaH_prod = 390000              # enthalpy produced by turbine [J/Kg]
+DeltaH_prod = 400000              # enthalpy produced by turbine [J/Kg]
 
-
-mdot = 0.777482308                # total mass flow [kg/s]
-one.rho = 0.98317                 # inlet density [kg/m^3]
+# DESIGN VARIABLES
+mdot = 1.5*0.777482308                # total mass flow [kg/s]
 one.alpha = 0                     # stator inlet angle (0 because flow is axial) [rad]
-
+GR = 0.4                          # reaction degree [-]
+psi = 1.75                        # loading factor [-]
+RHT = 0.7                         # ratio hub/tip radius
 
 
 # FLUID PROPERTIES (TURBINE)
@@ -60,21 +62,19 @@ eta_stator_init = 0.919              # stator efficiency [-]
 eta_rotor_init = 0.827               # rotor efficiency [-]
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
-bounds_angles = ([np.radians(70),np.radians(-70)], [np.radians(75), np.radians(-60)])
+bounds_angles = ([np.radians(60),np.radians(-70)], [np.radians(75), np.radians(-50)])
 
 
 
 
 # ASSUMPTIONS
-GR = 0.4                          # reaction degree [-]
-psi = 1.75                        # loading factor [-]
-RHT = 0.7                         # ratio hub/tip radius
+one.rho = 0.98317                 # inlet density [kg/m^3]
 h_c_stator = 0.7                  # height/chord ratio stator [-]
 h_c_rotor = 1.4                   # height/chord ratio rotor [-]
 t_o = 0.25                        # trailing-egde thickness to throat opening ratio [-]
 
 # select whether to use loss model and optimization 'losses', or simple design 'simple'
-design_tool_version = 'losses'
+design_tool_version = 'losses_limits'
 
 
 
@@ -96,9 +96,10 @@ thr.geo.to = t_o
 
 
 # compute cycle
-if design_tool_version == 'losses':
-    # using the initial efficiencies, calculate the cycle
-    # and integrate the Kacker-Okapuu losses
+if design_tool_version == 'losses_limits':
+    etas = np.array([eta_stator_init, eta_rotor_init])
+    res = converge_efficiencies_limits(etas, stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot)
+elif design_tool_version == 'losses_no_limits':
     etas = np.array([eta_stator_init, eta_rotor_init])
     converge_efficiencies(etas, stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot)
 elif design_tool_version == 'simple':
@@ -106,7 +107,10 @@ elif design_tool_version == 'simple':
     stator.eta = eta_stator_init
     rotor.eta = eta_rotor_init
     no_losses(stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot)
-
+else:
+    print("A correct tool version must be selected. \nPlease define variable design_tool_version as one of the following:")
+    print("  -  simple\n  -  losses_limits\n  -  losses_no_limits")
+    sys.exit("Program wil quit now")
 
 # 1.3
 # DeltaH_calculations
@@ -145,11 +149,10 @@ DeltaW = thr.vel.W - two.vel.W
 h3h2 = thr.geo.h/two.geo.h
 
 # %% Tables and results
-tab.print_all_tables(one, two, thr, Mach3_init, alpha2_init, beta3_init, DeltaH_prod, DeltaH_calc, DeltaH_T, mdot, Deltabeta, psi, GR, h3h2, stator, rotor, eta_stator_init, eta_rotor_init)
+# tab.print_all_tables(one, two, thr, Mach3_init, alpha2_init, beta3_init, DeltaH_prod, DeltaH_calc, DeltaH_T, mdot, Deltabeta, psi, GR, h3h2, stator, rotor, eta_stator_init, eta_rotor_init)
 
 print("Stator pressure loss: ", round(stator.omegaKC,2))
 print("Rotor pressure loss: ", round(rotor.omegaKC,2))
-
 print("Stator efficiency: ", round(stator.eta,2))
 print("Rotor efficiency: ", round(rotor.eta,2))
 

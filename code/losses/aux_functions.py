@@ -56,6 +56,11 @@ def isen_velocity(cp, T0, T):
     return V
 
 def losses(V, Vs, P0x, P0y, Py, component):
+
+    if (P0y == Py):
+        P0y = 1.00001*P0y
+    if (P0x == Py):
+        P0x = 1.00001*P0x
     component.xi = (Vs**2 - V**2)/Vs**2
     component.lrt = V**2/Vs**2
     component.tpl = (P0x - P0y)/(P0x - Py)
