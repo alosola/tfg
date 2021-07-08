@@ -64,10 +64,7 @@ def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma
         return np.array([diff1, diff2])
 
 
-    etas = fsolve(f_etas,efficiencies_init,args=(stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot))
-
-    stator.eta = etas[0]
-    rotor.eta = etas[1]
+    stator.eta, rotor.eta = fsolve(f_etas,efficiencies_init,args=(stator, rotor, one, two, thr, gamma, cp, R, GR, psi, DeltaH_prod, bounds_angles, RHT, mdot))
 
 
     # 1.
@@ -95,8 +92,6 @@ def converge_efficiencies(efficiencies_init, stator, rotor, one, two, thr, gamma
 
     stator.eta = (one.T0 - thr.T0)/(one.T0 - (thr.Ts+thr.vel.V**2/2/cp))
     rotor.eta = (one.T0 - thr.T0)/(one.T0 - thr.Ts)
-
-
 
 
 
@@ -141,8 +136,7 @@ def converge_efficiencies_limits(efficiencies_init, stator, rotor, one, two, thr
         diff1 = abs(stator.omega - stator.omegaKC)
         diff2 = abs(rotor.omega  - rotor.omegaKC)
 
-        return np.amax(np.array([diff1, diff2]))
-        return [diff1, diff2]
+        return diff1 + diff2
 
 
 

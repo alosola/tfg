@@ -95,7 +95,7 @@ def kackerokapuu(component, s, alpha2, alpha3, c, bx, h, M2, M3, P2, P3, gamma, 
     YTC = tip_clearance()
     YTET = trailing_edge(M3, gamma, t_o)
 
-    Ytot = YP*fRe + YS + YTET
+    Ytot = YP*fRe + YS + YTET + YTC
 
     return Ytot
 

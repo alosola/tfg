@@ -75,7 +75,7 @@ def turbine_geometry(one, two, thr):
 def geometry(one, two, thr):
 
     fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111)
+    ax2 = fig2.add_subplot(111, aspect=0.9)
     ax2.set_ylabel('Radial distance [m]')
     ax2.set_xlabel('Turbine axis [m]')
 
@@ -106,8 +106,8 @@ def geometry(one, two, thr):
     polygon_antirotor = plt.Polygon(antirotor,  fill=True, edgecolor=None, facecolor='#7cbf78')
     ax2.add_patch(polygon_antirotor)
 
-
-    plt.axis([-0.3*Xrotor,(Xrotor + Wrotor + 0.3*Xrotor),-1.3*thr.geo.Rt,1.3*thr.geo.Rt])
+    # plt.axis([-0.3*Xrotor,(Xrotor + Wrotor + 0.3*Xrotor),-1.3*thr.geo.Rt,1.3*thr.geo.Rt])
+    plt.axis([-0.3*Xrotor,(2.6*thr.geo.Rt - 0.3*Xrotor)/2,-1.3*thr.geo.Rt,1.3*thr.geo.Rt])
 
     Rm_top = np.ones(100)*two.geo.Rm
     Rm_bot = -Rm_top
