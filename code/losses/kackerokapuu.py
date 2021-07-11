@@ -22,7 +22,7 @@ from KC_secondary_losses import secondary_losses
 import scipy.interpolate
 
 
-def trailing_edge(M3, gamma, t_o):
+def trailing_edge(M3, gamma, t_o, alpha2, alpha3):
 
     # for axial entry blades (not impulse blades)
     dataset = np.genfromtxt('dataset_trailing_edge.csv', delimiter=',')
@@ -31,21 +31,15 @@ def trailing_edge(M3, gamma, t_o):
 
     spline = scipy.interpolate.InterpolatedUnivariateSpline(x,y)
 
-    dphi2 = np.float64(spline(t_o))
+    dphi2_0 = np.float64(spline(t_o))
+    dphi2_2 = 0.5*dphi2_0
+
+    dphi = dphi2_0 + abs(alpha2/alpha3)*(alpha2/-alpha3)*(dphi2_2 - dphi2_0)
 
     pw = -gamma/(gamma-1)
-    YTET = ( (1-(gamma-1)/2*M3**2*(1/(1-dphi2)-1))**pw -1)/(1-(1+(gamma-1)/2*M3**2)**pw)
+    YTET = ( (1-(gamma-1)/2*M3**2*(1/(1-dphi)-1))**pw -1)/(1-(1+(gamma-1)/2*M3**2)**pw)
 
     return YTET
-
-
-
-
-def tip_clearance():
-    losses = 0
-    return losses
-
-
 
 
 
@@ -92,10 +86,9 @@ def kackerokapuu(component, s, alpha2, alpha3, c, bx, h, M2, M3, P2, P3, gamma, 
     YP = profile_losses(s/c, alpha3, alpha2, M2, M3, K, P2, P3, gamma, RHT)
     fRe = reynolds_correction(Re)
     YS = secondary_losses(alpha2, alpha3, h/c, bx, h, M2, M3)
-    YTC = tip_clearance()
-    YTET = trailing_edge(M3, gamma, t_o)
+    YTET = trailing_edge(M3, gamma, t_o, alpha2, alpha3)
 
-    Ytot = YP*fRe + YS + YTET + YTC
+    Ytot = YP*fRe + YS + YTET
 
     return Ytot
 

@@ -26,12 +26,16 @@ def secondary_losses_fAR(h_c):
     return fAR
 
 
+def secondary_losses_alpham(alpha2, alpha3):
+    alpham = np.arctan(0.5*(np.tan(alpha2)-np.tan(alpha3)))
+    return alpham
+
 def secondary_losses_AMDC(alpha2, alpha3, h_c):
     ## confirm equations are correct with the KTH thesis
 
     fAR = secondary_losses_fAR(h_c)
 
-    alpham = np.arctan(0.5*(np.tan(alpha2)-np.tan(alpha3)))
+    alpham = secondary_losses_alpham(alpha2, alpha3)
     C1 = 2*(np.tan(alpha2)-np.tan(alpha3))*np.cos(alpham)
 
     YS_AMDC = 0.0334*fAR*np.cos(alpha3)/np.cos(alpha2)*C1**2*np.cos(alpha3)**2/np.cos(alpham)**3

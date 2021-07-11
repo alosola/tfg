@@ -74,7 +74,7 @@ h_c_rotor = 1.4                   # height/chord ratio rotor [-]
 t_o = 0.25                        # trailing-egde thickness to throat opening ratio [-]
 
 # select whether to use loss model and optimization 'losses', or simple design 'simple'
-design_tool_version = 'losses_limits'
+design_tool_version = 'losses_no_limits'
 
 
 

@@ -72,16 +72,16 @@ def profile_losses_alpha2_alpha3(S_C, alpha3):
 
 
 
-def thickness_chord_ratio(deltabeta):
+def thickness_chord_ratio(sumtheta):
 
-    deltabeta = abs(np.degrees(deltabeta))
+    sumtheta = abs(np.degrees(sumtheta))
 
-    if deltabeta > 120:
+    if sumtheta > 120:
         t_c = 0.25
-    if deltabeta < 40:
+    elif sumtheta < 40:
         t_c = 0.15
     else:
-        t_c = 0.15 + 1.25e-03*(deltabeta - 40)
+        t_c = 0.15 + 1.25e-03*(sumtheta - 40)
 
     return t_c
 
