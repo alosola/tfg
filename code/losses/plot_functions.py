@@ -122,8 +122,6 @@ def geometry(one, two, thr):
     plt.plot(Xz, Zero, '#6b6b6b', linewidth = 7)
 
     fig2.savefig('graph_geometry.png', dpi=90, bbox_inches='tight')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.axis('scaled')
     plt.show()
-
-
-
-

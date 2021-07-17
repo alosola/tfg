@@ -33,19 +33,21 @@ stator = component()
 
 ###################### GIVEN PARAMETERS AND ASSUMTIOSN ########################
 
-# GIVEN PARAMETERS (TURBINE)
-one.T0 = 1400                     # inlet total temperature (exit combustor) = T4t [K]
-one.P0 = 397194                   # inlet total pressure (exit combustor) [Pa]
-thr.P0 = 101325                   # outlet total pressure [Pa]
-thr.T0 = 1083.529                 # outlet total temperature [K]
-DeltaH_prod = 400000              # enthalpy produced by turbine [J/Kg]
+# turbine model from KTH GUEDEZ
 
-# DESIGN VARIABLES
-mdot = 1.5*0.777482308                # total mass flow [kg/s]
+# GIVEN PARAMETERS (TURBINE)
+one.T0 = 1423                     # inlet total temperature (exit combustor) = T4t [K]
+one.P0 = 500000                  # inlet total pressure (exit combustor) [Pa]
+thr.P0 = 200000                    # outlet static pressure [Pa]
+thr.T0 = 1000                  #  # outlet total temperature [K]
+DeltaH_prod = 400000           #  # enthalpy produced by turbine [J/Kg]
+
+# # DESIGN VARIABLES
+mdot = 100                        # total mass flow [kg/s]
 one.alpha = 0                     # stator inlet angle (0 because flow is axial) [rad]
-GR = 0.4                          # reaction degree [-]
-psi = 1.75                        # loading factor [-]
-RHT = 0.7                         # ratio hub/tip radius
+GR = 0.35                         # reaction degree [-]
+psi = 1.6                         # loading factor [-]
+RHT = 0.7                      #  # ratio hub/tip radius
 
 
 # FLUID PROPERTIES (TURBINE)
@@ -55,26 +57,26 @@ R = 286.1538462          # [J/kg/K]
 
 
 # INITIAL GUESSES
-Mach3_init = 0.5                  # rotor/turbine exit Mach number [-]
-alpha2_init  = np.radians(75)     # stator angle [deg->rad]
-beta3_init = np.radians(-65)      # rotor angle [deg->rad]
-eta_stator_init = 0.919              # stator efficiency [-]
-eta_rotor_init = 0.827               # rotor efficiency [-]
+Mach3_init = 0.5                 #  # rotor/turbine exit Mach number [-]
+alpha2_init  = np.radians(72.5)     # stator angle [deg->rad]
+beta3_init = np.radians(-69.5)   #  # rotor angle [deg->rad]
+eta_stator_init = 0.85           #  # stator efficiency [-]
+eta_rotor_init = 0.85            #  # rotor efficiency [-]
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
 bounds_angles = ([np.radians(60),np.radians(-70)], [np.radians(75), np.radians(-50)])
 
 
-
-
-# ASSUMPTIONS
+# # ASSUMPTIONS
 one.rho = 0.98317                 # inlet density [kg/m^3]
 h_c_stator = 0.7                  # height/chord ratio stator [-]
 h_c_rotor = 1.4                   # height/chord ratio rotor [-]
 t_o = 0.25                        # trailing-egde thickness to throat opening ratio [-]
 
+
 # select whether to use loss model and optimization 'losses', or simple design 'simple'
 design_tool_version = 'losses_no_limits'
+
 
 
 
@@ -167,6 +169,3 @@ graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel
 
 # %% GRAPH ROTOR GEOMETRY
 graphs.geometry(one, two, thr)
-
-
-
