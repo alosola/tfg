@@ -35,7 +35,7 @@ def velocity_triangle(V2u, V2x, V3u, V3x, W2u, W2x, W3u, W3x):
     arrayW3 = np.array([[0,W3u],[W3x + z0,z0]])
     arrayU3 = np.array([[V3u,W3u],[z0,z0]])
 
-    arrayN = np.array(['V2', 'W2', 'U2', 'V3', 'W3', 'U3'])
+    arrayN = np.array([r'$V_2$', r'$W_2$', r'$U_2$', r'$V_3$', r'$W_3$', r'$U_3$'])
     arrayT = [arrayV2, arrayW2, arrayU2, arrayV3, arrayW3, arrayU3]
 
     X = 1.2*max([V2u, W2u, V3u, W3u])
@@ -49,6 +49,8 @@ def velocity_triangle(V2u, V2x, V3u, V3x, W2u, W2x, W3u, W3x):
         plt.axis([max(x),min(x),1.3*min(y),max(y)])
         plt.legend()
         i+=1
+    plt.xlabel(r'Tangential velocity $v_u$ [m/s]')
+    plt.ylabel(r'Axial velocity $v_x$ [m/s]')
     plt.savefig('velocity_triangle.png', dpi=1000)
     plt.show()
 
@@ -106,10 +108,10 @@ def geometry(one, two, thr):
     Xz = np.linspace(0,Xrotor+Wrotor,100)
     plt.plot(Xz, Zero, '#6b6b6b', linewidth = 7)
 
-    # plt.gca().set_aspect('equal', adjustable='box')
-    # plt.axis('scaled')
-    # fig2.patch.set_visible(False)
-    # plt.axis('off')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.axis('scaled')
+    fig2.patch.set_visible(False)
+    plt.axis('off')
     plt.show()
 
     fig2.savefig('graph_geometry.png', bbox_inches='tight')
