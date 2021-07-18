@@ -37,56 +37,61 @@ stator = component()
 
 ###################### GIVEN PARAMETERS AND ASSUMTIOSN ########################
 
-# turbine model from gas generator for automobile study
-# jorge saavedra
+# turbine model from Design Study for Single Stage High Pressure Turbine of Gas
+# Turbine Engines
+# Ajoko, Tolumoye John
+# LYULKA AL-2LF-3
+
 
 # GIVEN PARAMETERS (TURBINE)
-one.T0 = 1400                     # inlet total temperature (exit combustor) = T4t [K]
-one.P0 = 397194                  # inlet total pressure (exit combustor) [Pa]
-thr.P0 = 101372                    # outlet static pressure [Pa]
-thr.T0 = 1085.12                  #  # outlet total temperature [K]
-DeltaH_prod = 390000           #  # enthalpy produced by turbine [J/Kg]
+one.T0 = 562                     # inlet total temperature (exit combustor) = T4t [K]
+one.P0 = 346325                  # inlet total pressure (exit combustor) [Pa]
+thr.P0 = 105305                    # outlet static pressure [Pa]
+thr.T0 = 562-118                  #  # outlet total temperature [K]
+DeltaH_prod = 180000 #3.84e+06/25.5            #  # enthalpy produced by turbine [J/Kg]
 
 # # DESIGN VARIABLES
-mdot = 0.777                        # total mass flow [kg/s]
+mdot =  25.5                        # total mass flow [kg/s]
 one.alpha = 0                     # stator inlet angle (0 because flow is axial) [rad]
-GR = 0.32                         # reaction degree [-]
-psi = 1.75                         # loading factor [-]
-RHT = 0.9                      #  # ratio hub/tip radius
-
+GR = 0.4                      # reaction degree [-]
+psi = 2.065                         # loading factor [-]
+RHT = 0.98                      #  # ratio hub/tip radius
 
 # # FLUID PROPERTIES (TURBINE)
-gamma = 1.3              # [-]
-cp = 1240                # [J/kg/K]
+# gamma = 1.4              # [-]
+# cp = 9756                # [J/kg/K]
+# R = cp*(1-1/gamma)          # [J/kg/K]
+
+# FLUID PROPERTIES (TURBINE)
+gamma = 1.29              # [-]
+cp = 1277                # [J/kg/K]
 R = 286.1538462          # [J/kg/K]
 
 
 
 # INITIAL GUESSES
-Mach3_init = 0.5                 #  # rotor/turbine exit Mach number [-]
-alpha2_init  = np.radians(72.5)     # stator angle [deg->rad]
-beta3_init = np.radians(-69.5)   #  # rotor angle [deg->rad]
-eta_stator_init = 0.8888           #  # stator efficiency [-]
-eta_rotor_init = 0.808            #  # rotor efficiency [-]
-etat = eta_stator_init*eta_rotor_init
+Mach3_init = 0.46                 #  # rotor/turbine exit Mach number [-]
+alpha2_init  = np.radians(63.5)     # stator angle [deg->rad]
+beta3_init = np.radians(-50)   #  # rotor angle [deg->rad]
+tau = 1710/1757
+etat = (1-tau)/(1-tau**(1/0.9))
+eta_stator_init = np.sqrt(etat)           #  # stator efficiency [-]
+eta_rotor_init = np.sqrt(etat)            #  # rotor efficiency [-]
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
-bounds_angles = ([np.radians(70),np.radians(-70)], [np.radians(75), np.radians(-65)])
+bounds_angles = ([np.radians(60),np.radians(-70)], [np.radians(75), np.radians(-50)])
 
 
 # # ASSUMPTIONS
-h_c_stator = 0.7                  # height/chord ratio stator [-]
-h_c_rotor = 1.4                     # height/chord ratio rotor [-]
+h_c_stator = 0.75                  # height/chord ratio stator [-]
+h_c_rotor = 0.75                     # height/chord ratio rotor [-]
 t_o = 0.22                        # trailing-egde thickness to throat opening ratio [-]
 
 # expected results
-# in this order: eta_total, loading factor, A3, V3, Ystator, Yrotor
-expected = [etat, 0.5366, 0.01023, 263.92, 0.22, 0.362]
+expected = [etat, 0.503, 118, 0.25, 270]
 
 # select whether to use loss model and optimization 'losses', or simple design 'simple'
 design_tool_version = 'losses_no_limits'
-
-
 
 
 
@@ -182,7 +187,7 @@ graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel
 
 
 # %% GRAPH ROTOR GEOMETRY
-# graphs.geometry(one, two, thr)
+graphs.geometry(one, two, thr)
 
 
 

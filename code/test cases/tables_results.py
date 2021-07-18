@@ -149,48 +149,46 @@ def print_inputs_terminal(one, thr, inputs):
 
 def print_comparison_latex(expected, etat, one, two, thr, stator, rotor):
     datamat = {'Results':     ['Design tool','Reference'],
-               '$eta_{tot}$': [etat,expected[0]],
-               '$phi$':       [thr.vel.Vx/two.vel.U,expected[1]],
-               '$A_3$':        [thr.geo.A,expected[2]],
-               '$V_3$':        [thr.vel.V,expected[3]],
-               '$Y_{stator}$': [stator.omega,expected[4]],
-               '$Y_{rotor}$':  [rotor.omega,expected[5]],
+               'Efficiency':  [etat,expected[0]],
+               'Flow factor': [thr.vel.Vx/two.vel.U,expected[1]],
+               '$Delta T_0$': [two.T0 - thr.T0, expected[2]],
+               'A3':          [thr.geo.A,expected[3]],
+               'Um':          [two.vel.U,expected[4]]
                }
     dfmat = pd.DataFrame(datamat)
     dfmat = dfmat.round(2)
     print(dfmat.to_latex(index=False, escape=False))
     print ('\n')
 
-    array_results = [[etat,expected[0]],[thr.vel.Vx/two.vel.U,expected[1]],[thr.geo.A,expected[2]],[thr.vel.V,expected[3]],[stator.omega,expected[4]],[rotor.omega,expected[4]]]
+    array_results = [[etat,expected[0]],[thr.vel.Vx/two.vel.U,expected[1]],[two.T0 - thr.T0, expected[2]], [thr.geo.A,expected[3]],two.vel.U,expected[4]]
     sumt = 0
 
-    for i in range(5):
+    for i in range(4):
         sumt = sumt + array_results[i][0]/array_results[i][1]
 
-    print('Average variation: ', round(abs(1-sumt/5)*100,2),'%')
+    print('Average variation: ', round(abs(1-sumt/4)*100,2),'%')
 
 
 def print_comparison_terminal(expected, etat, one, two, thr, stator, rotor):
     datamat = {'Results':     ['Design tool','Reference'],
                'Efficiency':  [etat,expected[0]],
                'Flow factor': [thr.vel.Vx/two.vel.U,expected[1]],
-               'A3':          [thr.geo.A,expected[2]],
-               'V_3':         [thr.vel.V,expected[3]],
-               'Y_{stator}':  [stator.omega,expected[4]],
-               'Y_{rotor}':   [rotor.omega,expected[5]],
+               'Rh3':         [thr.geo.Rh,expected[2]],
+               'A3':       [thr.geo.A,expected[3]],
+               'Chord':       [two.geo.c*np.cos(np.radians(57))+thr.geo.c*np.cos(np.radians(60)),expected[4]],
                }
     dfmat = pd.DataFrame(datamat)
     dfmat = dfmat.round(2)
     print(dfmat.to_string(index=False))
     print ('\n')
 
-    array_results = [[etat,expected[0]],[thr.vel.Vx/two.vel.U,expected[1]],[thr.geo.A,expected[2]],[thr.vel.V,expected[3]],[stator.omega,expected[4]],[rotor.omega,expected[4]]]
+    array_results = [[etat,expected[0]],[thr.vel.Vx/two.vel.U,expected[1]],[thr.geo.Rh,expected[2]], [thr.geo.A,expected[3]],[two.geo.c+thr.geo.c,expected[4]]]
     sumt = 0
 
-    for i in range(5):
+    for i in range(4):
         sumt = sumt + array_results[i][0]/array_results[i][1]
 
-    print('Average variation: ', round(abs(1-sumt/5)*100,2),'%')
+    print('Average variation: ', round(abs(1-sumt/4)*100,2),'%')
 
 
 
