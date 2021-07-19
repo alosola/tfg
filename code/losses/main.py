@@ -47,7 +47,7 @@ mdot = 100                        # total mass flow [kg/s]
 one.alpha = 0                     # stator inlet angle (0 because flow is axial) [rad]
 GR = 0.35                         # reaction degree [-]
 psi = 1.6                         # loading factor [-]
-RHT = 0.7                      #  # ratio hub/tip radius
+RHT = 0.95                      #  # ratio hub/tip radius
 
 
 # FLUID PROPERTIES (TURBINE)

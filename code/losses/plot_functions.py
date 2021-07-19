@@ -124,4 +124,6 @@ def geometry(one, two, thr):
     fig2.savefig('graph_geometry.png', dpi=90, bbox_inches='tight')
     plt.gca().set_aspect('equal', adjustable='box')
     plt.axis('scaled')
+    fig2.patch.set_visible(False)
+    plt.axis('off')
     plt.show()
