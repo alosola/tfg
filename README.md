@@ -1,6 +1,6 @@
 # tfg
-Repository with the background resources for the TFG project: **Creation of a high-pressure turbine design tool
-**
+Repository with the background resources for the TFG project: **Creation of a high-pressure turbine design tool**
+
 The final results can be seen in the report document "TFG_FINAL".
 
 Some helpful references can be found:
