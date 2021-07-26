@@ -117,4 +117,53 @@ def geometry(one, two, thr):
     fig2.savefig('graph_geometry.png', bbox_inches='tight')
 
 
+def geometry_half(one, two, thr):
+
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(111)
+    ax2.set_ylabel('Radial distance [m]')
+    ax2.set_xlabel('Turbine axis [m]')
+
+    Xstator = 0
+    Wstator = np.asscalar(two.geo.c)
+    Xrotor = Xstator + Wstator + Wstator/5
+    Wrotor = thr.geo.c
+
+    High = 1.05*thr.geo.Rt
+    Low = thr.geo.Rh/1.05
+
+    background = [[Xstator, Low ], [Xstator, High], [Xrotor+Wrotor, High], [Xrotor+Wrotor, Low], [Xstator, Low]] #the points to trace the edges.
+    polygon_background = plt.Polygon(background,  fill=True, edgecolor=None, facecolor='#ededed')
+    ax2.add_patch(polygon_background)
+
+    h = one.geo.Rh
+    t = two.geo.Rt
+
+    stator = [[Xstator, h], [Xstator, t], [Xstator+Wstator, t], [Xstator+Wstator, h], [Xstator,h]] #the points to trace the edges.
+    polygon_stator = plt.Polygon(stator,  fill=True, edgecolor=None, facecolor='#7896bf')
+    ax2.add_patch(polygon_stator)
+
+    h3 = thr.geo.Rh
+    t3 = thr.geo.Rt
+
+    rotor = [[Xrotor, h], [Xrotor, t], [Xrotor+Wrotor, t3], [Xrotor+Wrotor, h3], [Xrotor,h]] #the points to trace the edges.
+    polygon_rotor = plt.Polygon(rotor,  fill=True, edgecolor=None, facecolor='#7cbf78')
+    ax2.add_patch(polygon_rotor)
+
+    Rm_top = np.ones(100)*two.geo.Rm
+    Xrm = np.linspace(0,Xstator+Wstator,100)
+    plt.plot(Xrm, Rm_top, color='black', linewidth = 0.5)
+
+    Xrm = np.linspace(Xrotor,Xrotor+Wrotor,100)
+    plt.plot(Xrm, Rm_top, color='black', linewidth = 0.5)
+
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.axis('scaled')
+    # fig2.patch.set_visible(False)
+    # plt.axis('off')
+    plt.show()
+
+    fig2.savefig('graph_geometry.png', bbox_inches='tight')
+
+
 

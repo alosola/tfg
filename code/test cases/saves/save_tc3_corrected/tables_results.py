@@ -193,7 +193,16 @@ def print_comparison_terminal(expected, etat, one, two, thr, stator, rotor):
     print('Average variation: ', round(abs(1-sumt/5)*100,2),'%')
 
 
-
+def print_deliverables_latex(one,two,thr, stator, rotor):
+    datamat = {'Variable':        ['Stator inlet angle','Stator outlet angle', 'Rotor inlet angle','Rotor outlet angle', 'Inlet height','Outlet height','Stator chord','Rotor chord','Height ratio','Mean-line radius'],
+               'Design tool':     [round(np.degrees(one.alpha),2),round(np.degrees(two.alpha),2),round(np.degrees(two.beta),2),round(np.degrees(thr.beta),2),round(one.geo.h*100,2),round(thr.geo.h*100,2),round(two.geo.c*100,2),round(thr.geo.c*100,2),round(thr.geo.h/one.geo.h,2),round(two.geo.Rm*100,2)],
+               'Reference':     [round(np.degrees(one.alpha),2),round(np.degrees(two.alpha),2),round(np.degrees(two.beta),2),round(np.degrees(thr.beta),2),round(one.geo.h*100,2),round(thr.geo.h*100,2),round(two.geo.c*100,2),round(thr.geo.c*100,2),round(thr.geo.h/one.geo.h,2),round(two.geo.Rm*100,2)],
+               'Unit':            ['$deg$', '$deg$','$deg$', '$deg$','cm','cm','cm','cm','-','cm']
+               }
+    dfmat = pd.DataFrame(datamat)
+    dfmat = dfmat.round(2)
+    print(dfmat.to_latex(index=False))
+    print ('\n')
 
 def print_testcase_terminal(one, two, thr, inputs, expected, etat, stator, rotor):
     print_mattignly_terminal(one,two,thr)

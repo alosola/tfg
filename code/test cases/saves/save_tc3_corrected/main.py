@@ -183,6 +183,11 @@ graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel
 
 # %% GRAPH ROTOR GEOMETRY
 # graphs.geometry(one, two, thr)
+graphs.geometry_half(one, two, thr)
+
+
+# %%
+tab.print_deliverables_latex(one,two,thr, stator, rotor)
 
 
 

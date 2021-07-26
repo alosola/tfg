@@ -261,17 +261,17 @@ import scipy.interpolate
 
 
 # ############# SUBSONIC MACH CORRECTION K3
-N = 200
-X = np.linspace(0,1.4,N)
-K3 = X**2
+# N = 200
+# X = np.linspace(0,1.4,N)
+# K3 = X**2
 
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.set_xlabel(r'Inverse axial aspect ratio $c_x/h$  [-]')
-ax.set_ylabel(r'Correction factor $K_3$ [-]')
-plt.plot(X, K3)
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# ax.set_xlabel(r'Inverse axial aspect ratio $c_x/h$  [-]')
+# ax.set_ylabel(r'Correction factor $K_3$ [-]')
+# plt.plot(X, K3)
+# plt.show()
 
 
 
@@ -311,33 +311,33 @@ plt.show()
 
 ######## STAGGER ANGLE
 
-# x = np.genfromtxt('stg_x.csv', delimiter=',')               # import SC vector
-# y = np.genfromtxt('stg_y.csv', delimiter=',')      # import alpha2 vector
-# z = np.flip(np.genfromtxt('stg_Zm.csv', delimiter=','),0)  # import YP mesh
+x = np.genfromtxt('stg_x.csv', delimiter=',')               # import SC vector
+y = np.genfromtxt('stg_y.csv', delimiter=',')      # import alpha2 vector
+z = np.flip(np.genfromtxt('stg_Zm.csv', delimiter=','),0)  # import YP mesh
 
-# YP_spline =  scipy.interpolate.RectBivariateSpline(x, y, z)  # create spline for evaluation
+YP_spline =  scipy.interpolate.RectBivariateSpline(x, y, z)  # create spline for evaluation
 
-# N = 60
-# X = np.linspace(np.amin(x),np.amax(x),N)
-# Y = np.linspace(np.amin(y),np.amax(y),N)
-# Z = np.zeros((N,N))
+N = 60
+X = np.linspace(np.amin(x),np.amax(x),N)
+Y = np.linspace(np.amin(y),np.amax(y),N)
+Z = np.zeros((N,N))
 
-# for i in range(N):
-#     for j in range(N):
-#         Z[i,j] = YP_spline(X[i],Y[j])
+for i in range(N):
+    for j in range(N):
+        Z[i,j] = YP_spline(X[i],Y[j])
 
-# Xgrid = np.zeros((N,N))
-# Ygrid = np.zeros((N,N))
-# for i in range(N):
-#     Xgrid[:,i] = X
-#     Ygrid[i,:] = Y
+Xgrid = np.zeros((N,N))
+Ygrid = np.zeros((N,N))
+for i in range(N):
+    Xgrid[:,i] = X
+    Ygrid[i,:] = Y
 
-# fig = plt.figure()
-# # ax = plt.axes()
-# # ax.plot_surface(Xgrid, Ygrid, Z, cstride=1, rstride=1, cmap='viridis', edgecolor='none')
-# plt.xlabel(r'Inlet angle $\alpha_{in}$ [deg]')
-# plt.ylabel(r'Outlet angle $\alpha_{out}$ [deg]')
-# # plt.zlabel(r'Stagger angle $\varphi$ [deg]')
-# plt.contourf(Xgrid, Ygrid, Z, 15, cmap='magma_r')
-# plt.colorbar()
-# plt.show()
+fig = plt.figure()
+# ax = plt.axes()
+# ax.plot_surface(Xgrid, Ygrid, Z, cstride=1, rstride=1, cmap='viridis', edgecolor='none')
+plt.xlabel(r'Inlet angle $\alpha_{in}$ [deg]')
+plt.ylabel(r'Outlet angle $\alpha_{out}$ [deg]')
+# plt.zlabel(r'Stagger angle $\varphi$ [deg]')
+plt.contourf(Xgrid, Ygrid, Z, 15, cmap='magma_r')
+plt.colorbar()
+plt.show()

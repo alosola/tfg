@@ -37,51 +37,61 @@ stator = component()
 
 ###################### GIVEN PARAMETERS AND ASSUMTIOSN ########################
 
-# turbine model from KTH TFM
-# first stage of 3-stage HP turbine
+# turbine model from Design Study for Single Stage High Pressure Turbine of Gas
+# Turbine Engines
+# Ajoko, Tolumoye John
+# LYULKA AL-2LF-3
+
 
 # GIVEN PARAMETERS (TURBINE)
-one.T0 = 1423                     # inlet total temperature (exit combustor) = T4t [K]
-one.P0 = 1900000                  # inlet total pressure (exit combustor) [Pa]
-thr.P0 = 200000               # outlet static pressure [Pa]
-thr.T0 = 1100                  #  # outlet total temperature [K]
-DeltaH_prod = 650000           #  # enthalpy produced by turbine [J/Kg]
+one.T0 = 562                     # inlet total temperature (exit combustor) = T4t [K]
+one.P0 = 346325                  # inlet total pressure (exit combustor) [Pa]
+thr.P0 = 105305                    # outlet static pressure [Pa]
+thr.T0 = 562-118                  #  # outlet total temperature [K]
+DeltaH_prod = 180000 #3.84e+06/25.5            #  # enthalpy produced by turbine [J/Kg]
 
 # # DESIGN VARIABLES
-mdot = 100                        # total mass flow [kg/s]
+mdot =  25.5                        # total mass flow [kg/s]
 one.alpha = 0                     # stator inlet angle (0 because flow is axial) [rad]
-GR = 0.35                         # reaction degree [-]
-psi = 1.6                         # loading factor [-]
-RHT = 0.92                      #  # ratio hub/tip radius
+GR = 0.4                      # reaction degree [-]
+psi = 2.065                         # loading factor [-]
+RHT = 0.98                      #  # ratio hub/tip radius
+
+# # FLUID PROPERTIES (TURBINE)
+# gamma = 1.4              # [-]
+# cp = 9756                # [J/kg/K]
+# R = cp*(1-1/gamma)          # [J/kg/K]
 
 # FLUID PROPERTIES (TURBINE)
-gamma = 1.3              # [-]
-cp = 1240                # [J/kg/K]
+gamma = 1.29              # [-]
+cp = 1277                # [J/kg/K]
 R = 286.1538462          # [J/kg/K]
 
-# INITIAL GUESSES
-Mach3_init = 0.5                 #  # rotor/turbine exit Mach number [-]
-alpha2_init  = np.radians(72.5)     # stator angle [deg->rad]
-beta3_init = np.radians(-60)   #  # rotor angle [deg->rad]
 
-etas = 0.74
-eta_stator_init = np.sqrt(etas)           #  # stator efficiency [-]
-eta_rotor_init = np.sqrt(etas)            #  # rotor efficiency [-]
+
+# INITIAL GUESSES
+Mach3_init = 0.46                 #  # rotor/turbine exit Mach number [-]
+alpha2_init  = np.radians(63.5)     # stator angle [deg->rad]
+beta3_init = np.radians(-50)   #  # rotor angle [deg->rad]
+tau = 1710/1757
+etat = (1-tau)/(1-tau**(1/0.9))
+eta_stator_init = np.sqrt(etat)           #  # stator efficiency [-]
+eta_rotor_init = np.sqrt(etat)            #  # rotor efficiency [-]
 # upper and lower bounds for alpha2 and beta3
 # in this format: [alpha2_min, beta3_min], [alpha2_max, beta3_max]
-bounds_angles = ([np.radians(72),np.radians(-70)], [np.radians(73), np.radians(-50)])
+bounds_angles = ([np.radians(60),np.radians(-70)], [np.radians(75), np.radians(-50)])
 
-# ASSUMPTIONS
-h_c_stator =0.9                    # height/chord ratio stator [-]
-h_c_rotor = 0.9                  # height/chord ratio rotor [-]
-t_o = 0.25                        # trailing-egde thickness to throat opening ratio [-]
 
-expected = [etas, 0.46, 0.611,  0.6, 0.065+0.054]
+# # ASSUMPTIONS
+h_c_stator = 0.75                  # height/chord ratio stator [-]
+h_c_rotor = 0.75                     # height/chord ratio rotor [-]
+t_o = 0.22                        # trailing-egde thickness to throat opening ratio [-]
+
+# expected results
+expected = [etat, 0.503, 118, 0.25, 270]
 
 # select whether to use loss model and optimization 'losses', or simple design 'simple'
 design_tool_version = 'losses_no_limits'
-
-
 
 
 
@@ -164,7 +174,7 @@ print("Rotor efficiency: ", round(rotor.eta,2))
 print("Total stage efficiency: ", round(stator.eta*rotor.eta,4),'\n')
 
 inputs = [DeltaH_prod, mdot, GR, psi, RHT]
-tab.print_testcase_latex(one, two, thr, inputs, expected, round(stator.eta*rotor.eta,4), stator, rotor)
+# tab.print_testcase_latex(one, two, thr, inputs, expected, round(stator.eta*rotor.eta,4), stator, rotor)
 
 
 # %% GRAPHS
@@ -177,7 +187,11 @@ graphs.velocity_triangle(two.vel.Vu, two.vel.Vx, thr.vel.Vu, thr.vel.Vx, two.vel
 
 
 # %% GRAPH ROTOR GEOMETRY
-graphs.geometry(one, two, thr)
+# graphs.geometry(one, two, thr)
+graphs.geometry_half(one, two, thr)
 
+
+# %%
+tab.print_deliverables_latex(one,two,thr, stator, rotor)
 
 
